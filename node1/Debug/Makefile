@@ -37,7 +37,9 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../adc_driver.c \
 ../ByggernBellLund.c \
+../sram_driver.c \
 ../uart_driver.c
 
 
@@ -48,19 +50,27 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+adc_driver.o \
 ByggernBellLund.o \
+sram_driver.o \
 uart_driver.o
 
 OBJS_AS_ARGS +=  \
+adc_driver.o \
 ByggernBellLund.o \
+sram_driver.o \
 uart_driver.o
 
 C_DEPS +=  \
+adc_driver.d \
 ByggernBellLund.d \
+sram_driver.d \
 uart_driver.d
 
 C_DEPS_AS_ARGS +=  \
+adc_driver.d \
 ByggernBellLund.d \
+sram_driver.d \
 uart_driver.d
 
 OUTPUT_FILE_PATH +=ByggernBellLund.elf
@@ -77,6 +87,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

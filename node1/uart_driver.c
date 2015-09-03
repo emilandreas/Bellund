@@ -21,8 +21,8 @@ int uartInit(unsigned int baud){
 	//Enable receiver and transmitter
 	UCSR0B |= (1<<RXEN0)|(1<<TXEN0);
 	
-	// 8data, 2stop
-	UCSR0C |= (1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00);
+	// 8data, 1stop
+	UCSR0C |= (1<<URSEL0)|(3<<UCSZ00);
 	
 	//Enable printf for uart
 	fdevopen(&uartSend, NULL);
