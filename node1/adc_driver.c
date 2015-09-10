@@ -5,13 +5,19 @@
  *  Author: andreab
  */ 
 #include <util/delay.h>
+#include <avr/io.h>
+
+void init_adc(){
+	//Make INT0 input
+	DDRD &= ~(1 << INT0);
+}
 
 uint8_t get_adc(int channel){
-	_delay_us(200);
 	volatile char *adc = (char *) 0x1400; // Start address adc
-	uint16_t adc_size       = 0x400;
+	uint16_t adc_size = 0x400;
 	
-	adc[0] = 3 + channel;
-	_delay_us(30);
+	
+	adc[0] = 4 + (channel%4);
+	_delay_us(200);
 	return adc[0];
 }

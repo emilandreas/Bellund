@@ -9,6 +9,7 @@
 #ifndef ADC_DRIVER_H_
 #define ADC_DRIVER_H_
 
+void init_adc();
 int get_adc(int channel);
 
 

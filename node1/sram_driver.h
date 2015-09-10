@@ -9,6 +9,8 @@
 #ifndef RAM_TEST_H_
 #define RAM_TEST_H_
 void SRAM_test(void);
+uint8_t getSRAM(int index);
+uint8_t setSRAM(int index, int value);
 
 
 

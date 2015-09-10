@@ -12,17 +12,32 @@
 #include "sram_driver.h"
 #include "adc_driver.h"
 #include "bus_init.h"
+#include "joy_driver.h"
+#include "oled_driver.h"
 
 int main(void)
 {
 	//DDRA = 0xFF;
 	uartInit(9600);
 	bus_init();
+	oled_init();
     while(1)
     {
-		//PORTA |= (1 << PINA0);
-		_delay_ms(5);
-		printf("adc output: x = %i\t\t y = %i\n\r",get_adc(2), get_adc(1));
-		//PORTA &= ~(1 << PINA0); 
+		Joystick joy = getJoystickPosition();
+		//printf("adc output: x = %i\t\t y = %i\t\t Direction = %i\n\r", get_adc(1),get_adc(0),joy.D);
+		/*
+		for (int line = 0; line < 8; line++){
+			oled_pos(line,line*64);
+			for(int i = 0; i <128; i++){
+				//_delay_ms(50);
+				write_data(i);
+			}
+		}
+		*/
+		oled_clear_screen();
+		oled_pos(0,0);
+		char temp = 'A';
+		oled_print(&temp);
+		_delay_ms(1000);
     }
 }

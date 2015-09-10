@@ -43,4 +43,17 @@ void SRAM_test(void)
 		}
 	}
 	printf("SRAM test completed with \n\r%4d errors in write phase and \n\r%4d errors in retrieval phase\n\n\r", write_errors, retrieval_errors);
+	
+}
+
+uint8_t getSRAM(int index){
+	volatile char *ext_ram = (char *) 0x1800;
+	return ext_ram[index];
+}
+
+uint8_t setSRAM(int index, int value){
+		volatile char *ext_ram = (char *) 0x1800;
+		uint8_t temp = ext_ram[index];
+		ext_ram[index] = value;
+		return temp;
 }
