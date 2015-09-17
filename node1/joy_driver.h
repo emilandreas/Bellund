@@ -19,6 +19,7 @@ typedef struct {
 
 Joystick getJoystickPosition();
 direction getJoystickDirection(int x, int y);
+void calibrateJoystick();
 
 
 #endif /* JOY_DRIVER_H_ */

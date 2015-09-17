@@ -14,6 +14,8 @@
 #include "bus_init.h"
 #include "joy_driver.h"
 #include "oled_driver.h"
+#include "menu.h"
+#include "draw.h"
 
 int main(void)
 {
@@ -21,9 +23,11 @@ int main(void)
 	uartInit(9600);
 	bus_init();
 	oled_init();
+	//oled_sram_init();
+	
     while(1)
     {
-		Joystick joy = getJoystickPosition();
+		
 		//printf("adc output: x = %i\t\t y = %i\t\t Direction = %i\n\r", get_adc(1),get_adc(0),joy.D);
 		/*
 		for (int line = 0; line < 8; line++){
@@ -34,10 +38,18 @@ int main(void)
 			}
 		}
 		*/
-		oled_clear_screen();
-		oled_pos(0,0);
-		char temp = 'A';
-		oled_print(&temp);
-		_delay_ms(1000);
+		
+		//oled_clear_screen();
+		//oled_pos(0,0);
+		//oled_print("Hello");
+		//oled_sram_write_string(0, "Hello", 4);
+		//flush_sram(0);
+		//_delay_ms(1000);
+		
+		menuSystem();
+		
+		
+		
+				
     }
 }

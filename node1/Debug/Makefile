@@ -39,7 +39,9 @@ SUBDIRS :=
 C_SRCS +=  \
 ../adc_driver.c \
 ../ByggernBellLund.c \
+../draw.c \
 ../joy_driver.c \
+../menu.c \
 ../oled_driver.c \
 ../sram_driver.c \
 ../uart_driver.c
@@ -54,7 +56,9 @@ ASM_SRCS +=
 OBJS +=  \
 adc_driver.o \
 ByggernBellLund.o \
+draw.o \
 joy_driver.o \
+menu.o \
 oled_driver.o \
 sram_driver.o \
 uart_driver.o
@@ -62,7 +66,9 @@ uart_driver.o
 OBJS_AS_ARGS +=  \
 adc_driver.o \
 ByggernBellLund.o \
+draw.o \
 joy_driver.o \
+menu.o \
 oled_driver.o \
 sram_driver.o \
 uart_driver.o
@@ -70,7 +76,9 @@ uart_driver.o
 C_DEPS +=  \
 adc_driver.d \
 ByggernBellLund.d \
+draw.d \
 joy_driver.d \
+menu.d \
 oled_driver.d \
 sram_driver.d \
 uart_driver.d
@@ -78,7 +86,9 @@ uart_driver.d
 C_DEPS_AS_ARGS +=  \
 adc_driver.d \
 ByggernBellLund.d \
+draw.d \
 joy_driver.d \
+menu.d \
 oled_driver.d \
 sram_driver.d \
 uart_driver.d
@@ -97,6 +107,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 
