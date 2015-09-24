@@ -39,10 +39,14 @@ SUBDIRS :=
 C_SRCS +=  \
 ../adc_driver.c \
 ../ByggernBellLund.c \
+../CAN_driver.c \
 ../draw.c \
 ../joy_driver.c \
+../MCP_driver.c \
 ../menu.c \
 ../oled_driver.c \
+../snake.c \
+../SPI_driver.c \
 ../sram_driver.c \
 ../uart_driver.c
 
@@ -56,40 +60,56 @@ ASM_SRCS +=
 OBJS +=  \
 adc_driver.o \
 ByggernBellLund.o \
+CAN_driver.o \
 draw.o \
 joy_driver.o \
+MCP_driver.o \
 menu.o \
 oled_driver.o \
+snake.o \
+SPI_driver.o \
 sram_driver.o \
 uart_driver.o
 
 OBJS_AS_ARGS +=  \
 adc_driver.o \
 ByggernBellLund.o \
+CAN_driver.o \
 draw.o \
 joy_driver.o \
+MCP_driver.o \
 menu.o \
 oled_driver.o \
+snake.o \
+SPI_driver.o \
 sram_driver.o \
 uart_driver.o
 
 C_DEPS +=  \
 adc_driver.d \
 ByggernBellLund.d \
+CAN_driver.d \
 draw.d \
 joy_driver.d \
+MCP_driver.d \
 menu.d \
 oled_driver.d \
+snake.d \
+SPI_driver.d \
 sram_driver.d \
 uart_driver.d
 
 C_DEPS_AS_ARGS +=  \
 adc_driver.d \
 ByggernBellLund.d \
+CAN_driver.d \
 draw.d \
 joy_driver.d \
+MCP_driver.d \
 menu.d \
 oled_driver.d \
+snake.d \
+SPI_driver.d \
 sram_driver.d \
 uart_driver.d
 
@@ -107,6 +127,14 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
+
+
+
+
 
 
 

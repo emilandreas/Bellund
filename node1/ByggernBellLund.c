@@ -16,6 +16,7 @@
 #include "oled_driver.h"
 #include "menu.h"
 #include "draw.h"
+#include "CAN_driver.h"
 
 int main(void)
 {
@@ -24,7 +25,7 @@ int main(void)
 	bus_init();
 	oled_init();
 	//oled_sram_init();
-	
+	CAN_init();
     while(1)
     {
 		
@@ -46,10 +47,21 @@ int main(void)
 		//flush_sram(0);
 		//_delay_ms(1000);
 		
-		menuSystem();
+		//menuSystem();
+		printf("Hello \n\r");
+		Message m;
+		m.id = 0b00001;
+		m.data[0] = 'h';
+		m.length = 4;
 		
+		CAN_transmit(&m);
+		printf("message: %c \n\r", m.data[0]);
 		
+		Message answer;
+		CAN_receive(&answer);
+		printf("answer: %c \n\r", answer.data[0]);
 		
+		_delay_ms(1000);
 				
     }
 }

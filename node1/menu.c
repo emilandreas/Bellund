@@ -10,17 +10,20 @@
 #include "oled_driver.h"
 #include "joy_driver.h"
 #include "draw.h"
+#include "snake.h"
 
 
 void menuSystem(){
 	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
 	menu highscore = {.name = "Highscore", .parent = &mainMenu};
-	mainMenu.submenues[0] = &highscore;
+	mainMenu.submenues[1] = &highscore;
 	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 1};
+	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 2};
 	playGame.functions[0] = &play_draw;
-	playGame.name_functions[0] = "Play Draw Game";
-	mainMenu.submenues[1] = &playGame;
+	playGame.functions[1] = &playSnake;
+	playGame.name_functions[0] = "Draw";
+	playGame.name_functions[1] = "Snake";
+	mainMenu.submenues[0] = &playGame;
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};
 	settings.functions[0] = &calibrateJoystick;

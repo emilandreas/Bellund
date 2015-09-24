@@ -121,6 +121,12 @@
     <Compile Include="bus_init.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="CAN_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CAN_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="draw.c">
       <SubType>compile</SubType>
     </Compile>
@@ -136,16 +142,37 @@
     <Compile Include="joy_driver.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="MCP2515.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MCP_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="menu.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="menu.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="MCP_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="oled_driver.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="oled_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="snake.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="snake.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SPI_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SPI_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sram_driver.h">
