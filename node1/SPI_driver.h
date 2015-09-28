@@ -10,7 +10,13 @@
 #define SPI_DRIVER_H_
 
 void SPI_init();
-char SPI_transmit(char c);
+uint8_t SPI_transmit(uint8_t data);
+void SPI_send(uint8_t c);
+uint8_t SPI_receive();
+
+void SPI_ss_high();
+void SPI_ss_low();
+
 
 
 
