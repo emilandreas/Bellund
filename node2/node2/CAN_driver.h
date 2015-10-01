@@ -10,9 +10,9 @@
 #define CAN_DRIVER_H_
 
 typedef struct{
-	uint8_t id;
-	uint8_t length;
-	uint8_t data[8];
+  uint8_t id;
+  uint8_t length;
+  uint8_t data[8];
 } Message;
 
 int CAN_init();

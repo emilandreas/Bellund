@@ -4,7 +4,7 @@
 
 adc_driver.c
 
-ByggernBellLund.c
+main.c
 
 CAN_driver.c
 

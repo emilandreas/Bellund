@@ -5,19 +5,24 @@
  *  Author: andreabm
  */ 
 #include <avr/io.h>
+#include <stdio.h>
+#include "uart_driver.h"
 #include "MCP_driver.h"
 #include "SPI_driver.h"
 #include "MCP2515.h"
 
 int MCP_init(){
-	//Star SPI driver
+	//Using printf in MPC_init
+	uartInit(9600);
+	
+	//Start SPI driver
 	SPI_init();
 	
 	//Reset MPC to enter configuration mode
 	MCP_reset();
 	
 	// Self-test
-	uint8_t value = (MCP_CANSTAT);
+	uint8_t value = MCP_read(MCP_CANSTAT);
 	if ((value & MODE_MASK) != MODE_CONFIG) {
 		printf("MCP2515 is NOT in configuration mode after reset!\n\r");
 		return 1;
@@ -49,9 +54,6 @@ uint8_t MCP_read(uint8_t address){
 	return data;
 }
 
-void MCP_read_rx(){
-	return 0;
-}
 
 void MCP_write(uint8_t address, uint8_t data){
 	toggle_cs(0);
@@ -65,6 +67,7 @@ void MCP_load_tx(){
 	return 0;
 }
 void MCP_rts(uint8_t buffer){
+	toggle_cs(0);
 	switch(buffer%4){ //Select buffer to use, 3 = all
 		case 0:
 			SPI_send(MCP_RTS_TX0);
@@ -81,6 +84,7 @@ void MCP_rts(uint8_t buffer){
 		default:
 			break;
 	}
+	toggle_cs(1);
 }
 uint8_t MCP_read_status(){
 	toggle_cs(0);

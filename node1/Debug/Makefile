@@ -38,7 +38,7 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../adc_driver.c \
-../ByggernBellLund.c \
+../main.c \
 ../CAN_driver.c \
 ../draw.c \
 ../joy_driver.c \
@@ -59,7 +59,7 @@ ASM_SRCS +=
 
 OBJS +=  \
 adc_driver.o \
-ByggernBellLund.o \
+main.o \
 CAN_driver.o \
 draw.o \
 joy_driver.o \
@@ -73,7 +73,7 @@ uart_driver.o
 
 OBJS_AS_ARGS +=  \
 adc_driver.o \
-ByggernBellLund.o \
+main.o \
 CAN_driver.o \
 draw.o \
 joy_driver.o \
@@ -87,7 +87,7 @@ uart_driver.o
 
 C_DEPS +=  \
 adc_driver.d \
-ByggernBellLund.d \
+main.d \
 CAN_driver.d \
 draw.d \
 joy_driver.d \
@@ -101,7 +101,7 @@ uart_driver.d
 
 C_DEPS_AS_ARGS +=  \
 adc_driver.d \
-ByggernBellLund.d \
+main.d \
 CAN_driver.d \
 draw.d \
 joy_driver.d \
@@ -155,7 +155,7 @@ LINKER_SCRIPT_DEP+=
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=4915200  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
