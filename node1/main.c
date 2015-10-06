@@ -8,17 +8,16 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "uart_driver.h"
-#include "sram_driver.h"
-#include "adc_driver.h"
+#include "Driver_files/uart_driver.h" 
+#include "Driver_files/sram_driver.h"
+#include "Driver_files/adc_driver.h"
 #include "bus_init.h"
-#include "joy_driver.h"
-#include "oled_driver.h"
-#include "menu.h"
-#include "draw.h"
-#include "CAN_driver.h"
-#include "MCP_driver.h"
-#include "MCP2515.h"
+#include "Driver_files/joy_driver.h"
+#include "Driver_files/oled_driver.h"
+#include "Interface_files/menu.h"
+#include "Game_files/draw.h"
+#include "Driver_files/CAN_driver.h"
+#include "Driver_files/MCP_driver.h"
 #include <string.h>
 
 int main(void)
