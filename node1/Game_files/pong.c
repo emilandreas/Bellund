@@ -52,19 +52,23 @@ void updateBallPosition(Ball *ball){
 		ball->angle *= -1;
 	}
 	else ball->posY = tempPosY;
-	if(ball->dir == RIGHT) ball->dir++;
-	else ball->dir--;
+	if(ball->dir == RIGHT)
+		ball->posX++;
+	else ball->posX--;
 }
+void updateSliderPosition(Slider *slide){
+	*slide = getSliderPosition();
+	slide->left = (slide->left)*(63-RACKETSIZE)/100;
+	slide->right = (slide->right)*(63-RACKETSIZE)/100;
+} 
 
 int playRound(){
 	Ball ball;
 	Slider slide;
 	ballInit(&ball);
-	
+	int time = 25;
 	while(1){
-		slide = getSliderPosition();
-		updateScreen:	
-
+		updateSliderPosition(&slide);
 		if (ball.posX >= 127){
 			if (racketHit(&ball, slide.right) ){
 				ball.dir = LEFT;
@@ -83,8 +87,9 @@ int playRound(){
 				return RIGHT;
 			}
 		}
+		updateBallPosition(&ball);
 		updateScreen(ball, slide.left, slide.right);
-		_delay_ms(200);
+		_delay_ms(20);
 	}
 }
 
@@ -107,10 +112,14 @@ void playPong(){
 void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
 	oled_sram_clear_screen(0);
 	for (int i = 0; i < RACKETSIZE; i++){
-		oled_sram_write_bit(0, 0, leftRacketPos + i);
+		oled_sram_write_bit(0, 1, leftRacketPos + i);
 		oled_sram_write_bit(0,126, rightRacketPos + i);
 	}
-	oled_sram_write_bit(0, ball.posX, ball.posY);
+	for(int i = 0; i < 2; i++){
+		for(int j = 0; j < 2; j++){
+			oled_sram_write_bit(0, ball.posX + i, ball.posY + j);
+		}
+	}
 	oled_sram_flush(0);
 }
 
@@ -123,4 +132,5 @@ void printEndScreen(char *endMessage){
 		}
 		else _delay_ms(300);
 	}
+	oled_sram_flush(0);	
 }

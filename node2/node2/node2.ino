@@ -5,6 +5,22 @@ extern "C" {
 }
 #include <avr/io.h>
 #include <stdio.h>
+//#include "servo.h"
+
+#include <Servo.h>
+
+
+Servo myServo;
+
+void servo_init(){
+  myServo.attach(A4);
+}
+int servo_set(int8_t pos){
+  //Map from % to angle in degrees
+  int angle = map(pos, -100, 100,150 ,50);
+  myServo.write(angle);
+  return angle;
+}
 
 // create a FILE structure to reference our UART output function
 
@@ -17,6 +33,7 @@ static int uart_putchar (char c, FILE *stream)
 }
 
 void setup() {
+  servo_init();
   //Start can
 
   // Start the UART
@@ -50,7 +67,9 @@ void loop() {
     int8_t y = answer.data[1];  
     printf("X: %i Y: %i \n\r", x, y);
   }
+  servo_set(answer.data[0]);
   
-  //Serial.print(answer.data[0]);
-  delay(100);
+  Serial.print(answer.data[0]);
+  printf("Angle: %i \r\n", servo_set(answer.data[0]));
+  delay(10);
 }

@@ -20,8 +20,8 @@ float yMean = 127;
 
 Slider getSliderPosition(){
 	Slider slide;
-	slide.left = ((get_adc(0))*100)/255;
-	slide.right = ((get_adc(1))*100)/255;
+	slide.left = ((get_adc(1))*100)/255;
+	slide.right = ((get_adc(0))*100)/255;
 	return slide;
 }
 
