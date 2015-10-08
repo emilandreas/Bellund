@@ -9,7 +9,7 @@
 #ifndef PONG_H_
 #define PONG_H_
 
-
+void playPong();
 
 
 

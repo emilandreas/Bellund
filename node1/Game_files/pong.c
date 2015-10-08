@@ -1,7 +1,8 @@
-#include <time.h>
+
 #include <stdlib.h>
 #include <util/delay.h>
-#include "../Driver_files/slider_driver.h"
+#include "pong.h"
+#include "../Driver_files/joy_driver.h"
 #include "../Driver_files/oled_driver.h"
 
 #define LEFT 0
@@ -26,7 +27,7 @@ int racketHit(Ball *ball, int racketPos){
 }
 
 void updateBallAngle(Ball *ball, int racketPos){
-	float hitPos = (float)(ball.posY - racketPos - 8)/8; //from -1 to 1
+	float hitPos = (float)(ball->posY - racketPos - 8)/8; //from -1 to 1
 	int newBallAngle = ball->angle + hitPos * 45;
 	if(newBallAngle > 45) ball->angle = 45;
 	else if(newBallAngle < -45) ball->angle = 45;
@@ -34,7 +35,6 @@ void updateBallAngle(Ball *ball, int racketPos){
 }
 
 void ballInit(Ball *ball){
-	srand(time(NULL));
 	ball->dir = rand() % 2;
 	ball->angle = (rand() % 91) - 45;
 }
@@ -57,45 +57,49 @@ void updateBallPosition(Ball *ball){
 }
 
 int playRound(){
-	int leftRacketPos = 25;
-	int rightRacketPos = 25;
 	Ball ball;
-	ballInit(ball);
+	Slider slide;
+	ballInit(&ball);
+	
 	while(1){
-		leftRacketPos = getSliderPos(LEFT);
-		rightRacketPos = getSliderPos(RIGHT);
+		slide = getSliderPosition();
+		updateScreen:	
 
 		if (ball.posX >= 127){
-			if (racketHit(ball, rightRacketPos) ){
+			if (racketHit(&ball, slide.right) ){
 				ball.dir = LEFT;
-				updateBallAngle(&ball, rightRacketPos);
+				updateBallAngle(&ball, slide.right);
 			}
 			else{
 				return LEFT;
 			}
 		}
 		else if (ball.posX == 0){
-			if (racketHit(ball, leftRacketPos) ){
+			if (racketHit(&ball, slide.left) ){
 				ball.dir = RIGHT;
-				updateBallAngle(&ball, leftRacketPos);
+				updateBallAngle(&ball, slide.left);
 			}
 			else {
 				return RIGHT;
 			}
 		}
+		updateScreen(ball, slide.left, slide.right);
+		_delay_ms(200);
 	}
 }
 
 void playPong(){
 	int pointLeft = 0;
 	int pointRight = 0;
+	int point;
+	oled_sram_clear_screen(0);
 	while(1){
-		playRound() == RIGHT ? pointRight++ : pointLeft++;
+		point = playRound();
 		if(pointLeft == 5){
 			printEndScreen("Player Right won!");
 		}
 		else if(pointRight == 5){
-	`		printEndScreen("Player Left won!");
+			printEndScreen("Player Left won!");
 		}
 	}
 }

@@ -82,112 +82,126 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG</Value>
-      <Value>F_CPU=4915200</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>libm</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+            <Value>F_CPU=4915200</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="adc_driver.c">
+    <Compile Include="Driver_files\message_handler.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="adc_driver.h">
+    <Compile Include="Driver_files\message_handler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Driver_files\SPI_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Driver_files\SPI_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="bus_init.h">
+    <Compile Include="Driver_files\adc_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CAN_driver.c">
+    <Compile Include="Driver_files\adc_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CAN_driver.h">
+    <Compile Include="Driver_files\bus_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="draw.c">
+    <Compile Include="Driver_files\CAN_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="draw.h">
+    <Compile Include="Driver_files\CAN_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="font.h">
+    <Compile Include="Driver_files\joy_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="joy_driver.c">
+    <Compile Include="Driver_files\joy_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="joy_driver.h">
+    <Compile Include="Driver_files\MCP_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MCP2515.h">
+    <Compile Include="Driver_files\MCP_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MCP_driver.c">
+    <Compile Include="Driver_files\oled_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="menu.c">
+    <Compile Include="Driver_files\oled_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="menu.h">
+    <Compile Include="Driver_files\sram_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MCP_driver.h">
+    <Compile Include="Driver_files\sram_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="oled_driver.c">
+    <Compile Include="Driver_files\uart_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="oled_driver.h">
+    <Compile Include="Driver_files\uart_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="snake.c">
+    <Compile Include="Game_files\draw.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="snake.h">
+    <Compile Include="Game_files\draw.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SPI_driver.c">
+    <Compile Include="Game_files\pong.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SPI_driver.h">
+    <Compile Include="Game_files\pong.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="sram_driver.h">
+    <Compile Include="Game_files\snake.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="sram_driver.c">
+    <Compile Include="Game_files\snake.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="uart_driver.c">
+    <Compile Include="Interface_files\font.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="uart_driver.h">
+    <Compile Include="Interface_files\menu.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Interface_files\menu.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Driver_files" />
+    <Folder Include="Game_files" />
+    <Folder Include="Interface_files" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

@@ -27,28 +27,30 @@ void setup() {
 
   // The uart is the standard output device STDOUT.
   stdout = &uartout;
-
-  printf("%02x", CAN_init());
+  CAN_init();
 }
 
 void loop() {
-  /*
-    printf("Hello \n\r");
+  
+    //printf("Hello \n\r");
     Message m;
     m.id = 1;
     m.data[0] = 'l';
     m.data[1] = 'e';
-    m.data[2] = 'i';
+    m.data[2] = 't';
     m.data[3] = '\0';
     m.length = 4;
 
     CAN_transmit(&m);
-    printf("message: %s \n\r", m.data);
-  */
+    //printf("message: %s \n\r", m.data);
+  
   Message answer;
   if (!CAN_receive(&answer)) {
-    printf("answer: %s \n\r", answer.data);
+    int8_t x = answer.data[0];
+    int8_t y = answer.data[1];  
+    printf("X: %i Y: %i \n\r", x, y);
   }
+  
   //Serial.print(answer.data[0]);
-  delay(1000);
+  delay(100);
 }

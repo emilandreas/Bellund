@@ -11,18 +11,22 @@
 #include "../Driver_files/joy_driver.h"
 #include "../Game_files/draw.h"
 #include "../Game_files/snake.h"
+#include "../Game_files/pong.h"
 
 
 void menuSystem(){
 	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
+		
 	menu highscore = {.name = "Highscore", .parent = &mainMenu};
 	mainMenu.submenues[1] = &highscore;
 	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 2};
+	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 3};
 	playGame.functions[0] = &play_draw;
 	playGame.functions[1] = &playSnake;
+	playGame.functions[2] = &playPong;
 	playGame.name_functions[0] = "Draw";
 	playGame.name_functions[1] = "Snake";
+	playGame.name_functions[2] = "Pong";
 	mainMenu.submenues[0] = &playGame;
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};

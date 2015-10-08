@@ -14,13 +14,12 @@ int CAN_init(){
 	MCP_init();
 	//Enter config mode
 	MCP_reset();
-	//set loopback mode on CANCTRL
+	//set normal mode on CANCTRL
 	MCP_bit_modify(MCP_CANCTRL, MODE_MASK, MODE_NORMAL);
 	//Enable receve interrupt
 	MCP_bit_modify(MCP_CANINTE, MCP_RX_INT, 0xFF);
 	uint8_t value = MCP_read(MCP_CANSTAT);
 	if ((value & MODE_MASK) != MODE_NORMAL){
-		printf("System not in normal mode. Abandon ship.");
 		return 1;
 	}
 	return 0;
@@ -28,7 +27,12 @@ int CAN_init(){
 
 void CAN_transmit(Message *m){
 	//Write id to register
-	MCP_write(MCP_TXB0SIDL,m->id);
+	MCP_bit_modify(MCP_TXB0SIDL, 0xE0, m->id<<5);
+	MCP_bit_modify(MCP_TXB0SIDH, 0xFF, m->id>>3);
+	
+	//Write length to register
+	MCP_write(MCP_TXB0DLC, m->length);
+	
 	//Write length to register
 	MCP_write(MCP_TXB0DLC, m->length);
 	//Write data to register
@@ -46,12 +50,17 @@ int CAN_receive(Message *m){
 	//IF interrupt flag high
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF){
 		m->length = MCP_read(MCP_RBB0DLC);
+		//Get lower id
+		m->id = (MCP_read(MCP_RXB0SIDL) >> 5)&0x07;
+		m->id += (MCP_read(MCP_RXB0SIDH) << 3);
 		for(uint8_t i = 0; i < m->length; i++){
 			m->data[i] = MCP_read(MCP_RXB0D0 + i);
 		}
+		
 		//Set intrupt flag low to indicate that message is read
 		MCP_bit_modify(MCP_CANINTF, MCP_RX0IF, 0);
 		return 0;
 	}
 	return 1;
 }
+

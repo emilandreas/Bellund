@@ -7,6 +7,7 @@
 
 #define F_CPU 4915200
 #include <avr/io.h>
+#include <stdio.h>
 #include "joy_driver.h"
 #include "adc_driver.h"
 #include <math.h>
@@ -16,6 +17,13 @@
 
 float xMean = 127;
 float yMean = 127;
+
+Slider getSliderPosition(){
+	Slider slide;
+	slide.left = ((get_adc(0))*100)/255;
+	slide.right = ((get_adc(1))*100)/255;
+	return slide;
+}
 
 Joystick getJoystickPosition(){
 	Joystick joy;

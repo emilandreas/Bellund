@@ -1,5 +1,5 @@
 /*
- * main.c
+ * ByggernBellLund.c
  *
  * Created: 27.08.2015 10:11:04
  *  Author: Administrator
@@ -8,17 +8,16 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "Driver_files/uart_driver.h" 
+#include "Driver_files/uart_driver.h"
 #include "Driver_files/sram_driver.h"
 #include "Driver_files/adc_driver.h"
-#include "bus_init.h"
+#include "Driver_files/bus_driver.h"
 #include "Driver_files/joy_driver.h"
 #include "Driver_files/oled_driver.h"
 #include "Interface_files/menu.h"
 #include "Game_files/draw.h"
 #include "Driver_files/CAN_driver.h"
-#include "Driver_files/MCP_driver.h"
-#include <string.h>
+#include "Driver_files/message_handler.h"
 
 int main(void)
 {
@@ -26,14 +25,13 @@ int main(void)
 	uartInit(9600);
 	bus_init();
 	oled_init();
+	init_handler();
 	//oled_sram_init();
 	CAN_init();
-	
-	char c = 'a';
-	
+	printf("Reset?");
     while(1)
     {
-		c++;
+		menuSystem();
 		//printf("adc output: x = %i\t\t y = %i\t\t Direction = %i\n\r", get_adc(1),get_adc(0),joy.D);
 		/*
 		for (int line = 0; line < 8; line++){
@@ -51,27 +49,9 @@ int main(void)
 		//oled_sram_write_string(0, "Hello", 4);
 		//flush_sram(0);
 		//_delay_ms(1000);
-
-		printf("Hello \n\r");
-		Message m;
-		m.id = 1;
-		m.data[0] = c;
-		m.data[1] = 'e';
-		m.data[2] = 'i';
-		m.data[3] = '!';
-		m.length = 4;
-		
-		CAN_transmit(&m);
-		printf("message: %s \n\r", m.data);
 		
 		
-		Message answer;
-		memset(&answer, 0, sizeof(Message));
-		if (CAN_receive(&answer)){
-			printf("err: no msg\n");
-		}
-		printf("answer: %s \n\r", answer.data);
-		
-		_delay_ms(1500);
+	
+				//
     }
 }

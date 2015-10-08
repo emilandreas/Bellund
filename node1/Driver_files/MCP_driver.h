@@ -74,6 +74,7 @@ void MCP_bit_modify(uint8_t address, uint8_t mask, uint8_t data);
 #define MCP_TXB2CTRL	0x50
 #define MCP_RXB0CTRL	0x60
 #define MCP_RXB0SIDH	0x61
+#define MCP_RXB0SIDL	0x62
 #define MCP_RBB0DLC		0x65
 #define MCP_RXB0D0		0x66
 #define MCP_RXB1CTRL	0x70

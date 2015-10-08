@@ -6,16 +6,12 @@
 */
 
 #define F_CPU 4915200
-
 #include "snake.h"
 #include "../Driver_files/joy_driver.h"
 #include <util/delay.h>
 #include "../Driver_files/oled_driver.h"
 #include <stdlib.h>
 
-//Board dimentions
-#define width 64
-#define height 32
 
 int detectCollision(segment *s, int x, int y){
 	while(s){
@@ -29,8 +25,8 @@ int detectCollision(segment *s, int x, int y){
 
 void placeFood(int food[], segment *first){
 	do{
-		food[0] = rand() % width;
-		food[1] = rand() % height;
+		food[0] = rand() % 64;
+		food[1] = rand() % 32;
 	} while(detectCollision(first, food[0], food[1]));
 }
 
@@ -41,7 +37,7 @@ void drawBoard(segment *s, int food[]){
 			for (int j = 0; j < 2; j++){
 				oled_sram_write_bit(0, s->x*2 + i, s->y*2 + j);
 			}
-		}		
+		}
 		s = s->next;
 	}
 	for(int i = 0; i < 2; i++){
@@ -52,36 +48,22 @@ void drawBoard(segment *s, int food[]){
 	oled_sram_flush(0);
 }
 
-
-void addSegment(segment* first, int x, int y){
-	segment *temp = (segment*)malloc(sizeof(segment));
-	temp->x = x;
-	temp->y = y;
-	temp->next = first;
-	temp->prev = 0;
-	first->prev = temp;
-	first = temp;
-}
-
-void deleteSegment(segment* last){
-	segment* temp = last;
-	last = last->prev;
-	if(!(last == 0)){
-		last->next = 0;
-	}
-	free(temp);
-}
-
 void playSnake(){
 	//create linked list of snake segments
 	segment *first = (segment*)malloc(sizeof(segment));
-	first->x = height/2;
-	first->y = width/2;
+	first->x = 32;
+	first->y = 16;
 	segment *last = first;
 	first->next = 0;
 	first->prev = 0;
 	for(int i = 0; i < 4; i++){
-		addSegment(first, first->x+1, first->y);
+		segment *temp = (segment*)malloc(sizeof(segment));
+		temp->x = first->x + 1;
+		temp->y = first->y;
+		temp->next = first;
+		temp->prev = 0;
+		first->prev = temp;
+		first = temp;
 	}
 
 
@@ -91,46 +73,53 @@ void playSnake(){
 
 	//initialize direction of snake
 	direction S = RIGHT;
-	
+	oled_sram_clear_screen(0);
 	//gamplay while loop
 	while (!detectCollision(first->next, first->x, first->y)){
-		//Get user input and save in D
-		direction D = getJoystickPosition().D;
+		Joystick j = getJoystickPosition();
+		direction D = j.D;
 		S = (D == NEUTRAL) ? S : D;
 		//Create and set up next snake segment
-		addSegment(first, first->x, first->y);
+		segment *temp = (segment*)malloc(sizeof(segment));
+		
+		temp->x = first->x;
+		temp->y = first->y;
+		temp->next = first;
+		temp->prev = 0;
+		first->prev = temp;
 
 		//Find direction of snake movement
 		switch (S){
 			case UP:
-				first->y = (first->y + height - 1)%height;
-				break;
+			temp->y--;
+			break;
 			case DOWN:
-				first->y = (first->y + 1)%height;
-				break;
+			temp->y++;
+			break;
 			case LEFT:
-				first->x = (first->x + width -1)%width;
-				break;
+			temp->x--;
+			break;
 			case RIGHT:
-				first->x = (first->x + 1)%width;
-				break;
+			temp->x++;
+			break;
 			default:
 			break;
 		}
+
+		first = temp;
 		
-		//If snakes hits food it becomes longer else delete last segment
 		if(detectCollision(first, food[0], food[1])){//hit food?
 			placeFood(food, first);
+			temp = 0;
 		}
 		else{
-			deleteSegment(last);
+			temp = last;
+			last = last->prev;
+			last->next = 0;
+			free(temp);
 		}
 		drawBoard(first, food);
-		_delay_ms(100); //Speed of snake
-	}
-	//Clear memory
-	while(last){
-		deleteSegment(last);
+		_delay_ms(100);
 	}
 
 }
