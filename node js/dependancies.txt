@@ -1,0 +1,7 @@
+dependancies
+
+http://socket.io/get-started/chat/
+
+1) npm install --save express
+2) npm install --save socket.io
+3) npm install --save serialport
