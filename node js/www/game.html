@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang = "en">
+<html>
+<head>
+<title>Play Game</title>
+<meta charset = "UTF-8" />
+<link rel="stylesheet" type="text/css" href="/styles/style.css">
+</head>
+<body>
+
+<div id="header">
+<h1>Byggern</h1>
+</div>
+
+<div id="nav">
+<a href="index">Home</a><br>
+<a href="game">Play Game</a><br>
+<a href="score">High score</a><br>
+<a href="info">Information</a><br>
+</div>
+
+<div id="section">
+<center>
+
+<h2>Play Game</h2>
+Select controll mode<br>
+<button onclick="modeSelect(0)">Arrow keys</button>
+<button onclick="modeSelect(1)">Accelerometer</button><br>
+
+<table style="width:100%">
+  <tr>
+    <td></td>
+    <td><img id = "upArrow" onmousedown="arrow('UP');" onmouseup="arrow('NONE')" src="/images/up.png" alt="Up" style="width:150px;height:150px;"></td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><img id = "leftArrow" onmousedown="arrow('LEFT');" onmouseup="arrow('NONE')" src="/images/left.png" alt="Left" style="width:150px;height:150px;"></td>
+    <td></td> 
+    <td><img id = "rightArrow"onmousedown="arrow('RIGHT');" onmouseup="arrow('NONE')" src="/images/right.png" alt="Right" style="width:150px;height:150px;"></td>
+  </tr>
+</table><br>
+
+</center>
+</div>
+
+<div id="footer">
+Copyright © BelLund
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/scripts/game.js"></script>
+</body>
+</html>
