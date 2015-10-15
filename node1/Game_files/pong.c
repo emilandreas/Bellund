@@ -69,7 +69,7 @@ int playRound(){
 	int time = 25;
 	while(1){
 		updateSliderPosition(&slide);
-		if (ball.posX >= 127){
+		if (ball.posX >= 126){
 			if (racketHit(&ball, slide.right) ){
 				ball.dir = LEFT;
 				updateBallAngle(&ball, slide.right);
@@ -78,7 +78,7 @@ int playRound(){
 				return LEFT;
 			}
 		}
-		else if (ball.posX == 0){
+		else if (ball.posX == 1){
 			if (racketHit(&ball, slide.left) ){
 				ball.dir = RIGHT;
 				updateBallAngle(&ball, slide.left);
@@ -99,6 +99,8 @@ void playPong(){
 	int point;
 	oled_sram_clear_screen(0);
 	while(1){
+		printScore(pointLeft, pointRight);
+		_delay_ms(2000);
 		point = playRound();
 		if(pointLeft == 5){
 			printEndScreen("Player Right won!");
@@ -113,7 +115,7 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
 	oled_sram_clear_screen(0);
 	for (int i = 0; i < RACKETSIZE; i++){
 		oled_sram_write_bit(0, 1, leftRacketPos + i);
-		oled_sram_write_bit(0,126, rightRacketPos + i);
+		oled_sram_write_bit(0,127, rightRacketPos + i);
 	}
 	for(int i = 0; i < 2; i++){
 		for(int j = 0; j < 2; j++){
@@ -122,7 +124,17 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
 	}
 	oled_sram_flush(0);
 }
-
+void printScore(int leftPoints, int rightPoints){
+	oled_sram_clear_screen(0);
+	char lp = leftPoints + '0';
+	char mid = '-';
+	char rp = rightPoints + '0';
+	oled_sram_write_char(0, &lp, 2, 56);
+	oled_sram_write_char(0, &mid, 2, 64);
+	oled_sram_write_char(0, &rp, 2, 72);
+	oled_sram_write_string(0,)
+	oled_sram_flush(0);	
+}
 void printEndScreen(char *endMessage){
 	oled_sram_clear_screen(0);
 	for(int i = 0; i < 10; i++){
