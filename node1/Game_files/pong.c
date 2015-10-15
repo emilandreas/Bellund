@@ -37,6 +37,7 @@ void updateBallAngle(Ball *ball, int racketPos){
 void ballInit(Ball *ball){
 	ball->dir = rand() % 2;
 	ball->angle = (rand() % 91) - 45;
+	ball->posX = 63;
 }
 
 void updateBallPosition(Ball *ball){
@@ -89,7 +90,7 @@ int playRound(){
 		}
 		updateBallPosition(&ball);
 		updateScreen(ball, slide.left, slide.right);
-		_delay_ms(20);
+		_delay_ms(2);
 	}
 }
 
@@ -102,6 +103,8 @@ void playPong(){
 		printScore(pointLeft, pointRight);
 		_delay_ms(2000);
 		point = playRound();
+		if (point == LEFT) pointLeft++;
+		else pointRight++;
 		if(pointLeft == 5){
 			printEndScreen("Player Right won!");
 		}
@@ -132,7 +135,6 @@ void printScore(int leftPoints, int rightPoints){
 	oled_sram_write_char(0, &lp, 2, 56);
 	oled_sram_write_char(0, &mid, 2, 64);
 	oled_sram_write_char(0, &rp, 2, 72);
-	oled_sram_write_string(0,)
 	oled_sram_flush(0);	
 }
 void printEndScreen(char *endMessage){

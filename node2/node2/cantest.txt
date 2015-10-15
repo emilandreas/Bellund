@@ -1,0 +1,23 @@
+    //printf("Hello \n\r");
+    Message m;
+    m.id = 1;
+    m.data[0] = 'l';
+    m.data[1] = 'e';
+    m.data[2] = 't';
+    m.data[3] = '\0';
+    m.length = 4;
+
+    CAN_transmit(&m);
+    //printf("message: %s \n\r", m.data);
+  
+  Message answer;
+  if (!CAN_receive(&answer)) {
+    int8_t x = answer.data[0];
+    int8_t y = answer.data[1];  
+//    printf("X: %i Y: %i \n\r", x, y);
+  }
+  servo_set(answer.data[0]);
+  
+  
+  printf("Led: %i \r\n", get_diode());
+  delay(100);

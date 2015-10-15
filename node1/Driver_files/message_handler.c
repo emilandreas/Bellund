@@ -25,7 +25,6 @@ void init_handler(){
 	
 	//Enable global interrupts
 	sei();
-	 
 }
 
 ISR(INT1_vect){
@@ -54,6 +53,5 @@ void handle_message(){
 			break;
 		default:
 			break;
- 		
 	}
 }
