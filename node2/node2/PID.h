@@ -10,8 +10,8 @@
 #define PID_H_
 
 //Only allows ms between 1 and 16 with 1 byte counter register on timer 2
-void init_PID(double kp, double ki, double kd, int ms);
-int controllSignal();
-void pid(int error);
+void init_PID(double kp, double ki, double kd, double ms);
+double controllSignal();
+void pid(double error);
 
 #endif /* PID_H_ */

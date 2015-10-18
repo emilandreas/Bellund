@@ -11,20 +11,22 @@
 
 #define k 3 //current index
 
-volatile int u[k+1] = {0};
-volatile int e[k+1] = {0};
-double Kp, Ki, Kd, T;
+volatile double u[k+1] = {0};
+volatile double e[k+1] = {0};
+double a, b, c, T;
 
-int controllSignal(){
+double controllSignal(){
   return u[k];
 }
 
-void init_PID(double kp, double ki, double kd, int ms){
-  Kp = kp;
-  Ki = ki;
-  Kd = kd;
-  T = (double)ms/1000;
+void init_PID(double Kp, double Ki, double Kd, double ms){
+  //set pid parameters
+  T = ms/1000;
+  a = (Kp + Ki*T/2 +Kd/T);
+  b = (-Kp + Ki*T/2-2*Kd/T);
+  c = Kd/T;
 
+  //set up interrupt
   TCCR2A = 0;                           // set entire TCCR1A register to 0
   TCCR2B = 0;                           // same for TCCR1B
   TCNT2  = 0;                           //initialize counter value to 0
@@ -36,10 +38,11 @@ void init_PID(double kp, double ki, double kd, int ms){
 }
 
 ISR(TIMER2_COMPA_vect){
-  pid(0); //runs pid with new error
+  //Run pid with error
+  pid(1);
 }
 
-void pid(int error){
+void pid(double error){
   //move samples in list u and e
   for(int i = 0; i < k; i++){
     u[i] = u[i+1];
@@ -48,10 +51,6 @@ void pid(int error){
   e[k] = error;
   
   //Z-transform of pid reguator
-  double a = (Kp + Ki*T/2 +Kd/T);
-  double b = (-Kp + Ki*T/2-2*Kd/T);
-  double c = Kd/T;
-
   u[k] = u[k - 1] + a*e[k] + b*e[k-1] + c*e[k-2];
 }
 
