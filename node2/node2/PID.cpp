@@ -7,6 +7,8 @@
 #include <avr/io.h>
 #include <arduino.h>
 #include <avr/interrupt.h>
+#include "motor_driver.h"
+#include "controll_driver.h"
 #include "PID.h"
 
 #define k 3 //current index
@@ -37,9 +39,19 @@ void init_PID(double Kp, double Ki, double Kd, double ms){
   sei();                                // interrupts globally enabled
 }
 
+volatile int counter = 0;
 ISR(TIMER2_COMPA_vect){
   //Run pid with error
-  pid(1);
+  int pos = (get_position() - 50)*2;
+  int ref = get_joy().X;
+  req_joy();
+
+  if(++counter%2 == 0){
+    counter = 0;
+    //printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
+  }
+  
+  pid(pos - ref);
 }
 
 void pid(double error){
