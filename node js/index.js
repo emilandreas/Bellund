@@ -15,7 +15,8 @@ var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
 var sp = new SerialPort("COM5", {
-  parser: serialport.parsers.readline("\n")
+  parser: serialport.parsers.readline("\n"),
+  baudrate: 9600
 }, false);
 
 //Handle website calls
@@ -36,7 +37,8 @@ app.get('/score', function(req, res){
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('controll', function(c){
-    console.log('controlls: ' + c);
+    //console.log('controlls: ' + c);
+    sp.write("1," + c + "\n");
   });
   socket.on('score', function(){
     console.log('Get highscore');
@@ -52,12 +54,15 @@ http.listen(3000, function(){
 //Handle serial communication
 sp.open(function (error) {
   if ( error ) {
-    console.log('failed to open: '+ error);
-  } 
-  else {
-    console.log('Serial port open');
+    console.log('failed to open: '+error);
+  } else {
+    console.log('open');
     sp.on('data', function(data) {
       console.log('data received: ' + data);
+    });
+    sp.write("ls\n", function(err, results) {
+      console.log('err ' + err);
+      //console.log('results ' + results);
     });
   }
 });

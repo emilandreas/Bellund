@@ -32,13 +32,32 @@ void serialEvent() {
 }
 
 void handel_command(String str){
+  int command[8] = {0};
   //First letter in string is opcode
   switch(str[0]){
     case '1':
-      Serial.println(str);
+      parse_command(str, command);
+      break;
+    case '2':
       break;
     default:
       break;
+  }
+}
+
+void parse_command(String str, int command[]){
+  int counter = 1; // Start after first comma
+  String substr;
+  int commandCount = 0;
+  while(counter++ < str.length()){
+    if (str[counter] == ',' || counter == str.length()){
+      //Serial.println(substr.toInt());
+      command[commandCount++] = substr.toInt();
+      substr = "";
+    }
+    else{
+      substr += str[counter];
+    }
   }
 }
 

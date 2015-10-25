@@ -11,5 +11,6 @@
 
 void init_serial();
 void handel_command(String str);
+void parse_command(String str, int command[]);
 
 #endif /* SERIAL_HANDLER_H_ */
