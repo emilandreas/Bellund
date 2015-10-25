@@ -1,0 +1,8 @@
+1) install bluez
+2) start bluetooth device
+	sudo hciconfig hci0 up
+3) connect to HC-06(Bluetooth device) remember to check rfcomm number
+	sudo bluez-test-serial  98:D3:31:80:3F:36&
+4) listen to serial port (rfcomm)
+	in terminal -> cat dev/rfcomm1
+	in node -> rfcomm1
