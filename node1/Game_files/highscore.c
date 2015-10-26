@@ -45,7 +45,7 @@ uint8_t higscore_add(uint8_t game, highscore *score){
 	else{
 		highscore_save(game, score);
 		for (int i = score->place -1; i < 16; i++){
-			leaderboard[i].place += 2;
+			leaderboard[i].place++;
 			highscore_save(game, &leaderboard[i]);
 		}
 		return score->place;
