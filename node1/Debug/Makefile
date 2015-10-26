@@ -40,8 +40,10 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../Driver_files/EEPROM_driver.c \
 ../Driver_files/message_handler.c \
 ../Driver_files/SPI_driver.c \
+../Game_files/highscore.c \
 ../main.c \
 ../Driver_files/adc_driver.c \
 ../Driver_files/CAN_driver.c \
@@ -63,8 +65,10 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
 Driver_files/SPI_driver.o \
+Game_files/highscore.o \
 main.o \
 Driver_files/adc_driver.o \
 Driver_files/CAN_driver.o \
@@ -79,8 +83,10 @@ Game_files/snake.o \
 Interface_files/menu.o
 
 OBJS_AS_ARGS +=  \
+Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
 Driver_files/SPI_driver.o \
+Game_files/highscore.o \
 main.o \
 Driver_files/adc_driver.o \
 Driver_files/CAN_driver.o \
@@ -95,8 +101,10 @@ Game_files/snake.o \
 Interface_files/menu.o
 
 C_DEPS +=  \
+Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
 Driver_files/SPI_driver.d \
+Game_files/highscore.d \
 main.d \
 Driver_files/adc_driver.d \
 Driver_files/CAN_driver.d \
@@ -111,8 +119,10 @@ Game_files/snake.d \
 Interface_files/menu.d
 
 C_DEPS_AS_ARGS +=  \
+Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
 Driver_files/SPI_driver.d \
+Game_files/highscore.d \
 main.d \
 Driver_files/adc_driver.d \
 Driver_files/CAN_driver.d \
@@ -169,6 +179,10 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
 Driver_files/%.o: ../Driver_files/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
@@ -176,14 +190,14 @@ Driver_files/%.o: ../Driver_files/%.c
 	@echo Finished building: $<
 	
 
-./%.o: .././%.c
+Game_files/%.o: ../Game_files/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=4915200  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-Game_files/%.o: ../Game_files/%.c
+./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=4915200  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

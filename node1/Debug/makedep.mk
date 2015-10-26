@@ -2,9 +2,13 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+Driver_files\EEPROM_driver.c
+
 Driver_files\message_handler.c
 
 Driver_files\SPI_driver.c
+
+Game_files\highscore.c
 
 main.c
 

@@ -110,6 +110,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Driver_files\EEPROM_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Driver_files\EEPROM_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Driver_files\message_handler.c">
       <SubType>compile</SubType>
     </Compile>
@@ -120,6 +126,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Driver_files\SPI_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Game_files\highscore.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Game_files\highscore.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">

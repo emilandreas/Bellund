@@ -480,42 +480,20 @@ Disassembly of section .text:
      3a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 000003a6 <init_handler>:
-
-volatile int handelingMessage = 0;
-
-void init_handler(){
-	// Set pin as input (PD3 = INT1)
-	DDRD &= ~(1 << PD3);
      3a6:	8b 98       	cbi	0x11, 3	; 17
-	// Set internal pull-up
-	PORTD |= (1 << PD3);
      3a8:	93 9a       	sbi	0x12, 3	; 18
-	
-	//initialize external interrupt on falling edge
-	MCUCR |= (1<<ISC11);
      3aa:	85 b7       	in	r24, 0x35	; 53
      3ac:	88 60       	ori	r24, 0x08	; 8
      3ae:	85 bf       	out	0x35, r24	; 53
-	MCUCR &= ~(1<<ISC10);
      3b0:	85 b7       	in	r24, 0x35	; 53
      3b2:	8b 7f       	andi	r24, 0xFB	; 251
      3b4:	85 bf       	out	0x35, r24	; 53
-	GICR = (1<<INT1);
      3b6:	80 e8       	ldi	r24, 0x80	; 128
      3b8:	8b bf       	out	0x3b, r24	; 59
-	
-	//Enable global interrupts
-	sei();
      3ba:	78 94       	sei
      3bc:	08 95       	ret
 
 000003be <handle_message>:
-ISR(INT1_vect){
-	handle_message();
-}
-
-
-void handle_message(){
      3be:	cf 93       	push	r28
      3c0:	df 93       	push	r29
      3c2:	cd b7       	in	r28, 0x3d	; 61
@@ -526,44 +504,22 @@ void handle_message(){
      3cc:	de bf       	out	0x3e, r29	; 62
      3ce:	0f be       	out	0x3f, r0	; 63
      3d0:	cd bf       	out	0x3d, r28	; 61
-	Message m;
-	CAN_receive(&m);
      3d2:	ce 01       	movw	r24, r28
      3d4:	01 96       	adiw	r24, 0x01	; 1
      3d6:	0e 94 bc 02 	call	0x578	; 0x578 <CAN_receive>
-	
-	Joystick J;
-	
-	//Decide what to do
-	switch(m.id){
      3da:	89 81       	ldd	r24, Y+1	; 0x01
      3dc:	81 30       	cpi	r24, 0x01	; 1
      3de:	61 f4       	brne	.+24     	; 0x3f8 <handle_message+0x3a>
-		case JOY:
-			break;
-		case JOYREQ:
-			J = getJoystickPosition();
      3e0:	0e 94 77 03 	call	0x6ee	; 0x6ee <getJoystickPosition>
-			m.id = JOY;
      3e4:	19 82       	std	Y+1, r1	; 0x01
-			m.length = 3;
      3e6:	93 e0       	ldi	r25, 0x03	; 3
      3e8:	9a 83       	std	Y+2, r25	; 0x02
-			m.data[0] = J.X;
      3ea:	6b 83       	std	Y+3, r22	; 0x03
-			m.data[1] = J.Y;
      3ec:	7c 83       	std	Y+4, r23	; 0x04
-			m.data[2] = J.D;
      3ee:	8d 83       	std	Y+5, r24	; 0x05
-			CAN_transmit(&m);
      3f0:	ce 01       	movw	r24, r28
      3f2:	01 96       	adiw	r24, 0x01	; 1
      3f4:	0e 94 89 02 	call	0x512	; 0x512 <CAN_transmit>
-			break;
-		default:
-			break;
-	}
-}
      3f8:	2a 96       	adiw	r28, 0x0a	; 10
      3fa:	0f b6       	in	r0, 0x3f	; 63
      3fc:	f8 94       	cli
@@ -575,12 +531,6 @@ void handle_message(){
      408:	08 95       	ret
 
 0000040a <__vector_2>:
-	
-	//Enable global interrupts
-	sei();
-}
-
-ISR(INT1_vect){
      40a:	1f 92       	push	r1
      40c:	0f 92       	push	r0
      40e:	0f b6       	in	r0, 0x3f	; 63
@@ -598,9 +548,7 @@ ISR(INT1_vect){
      426:	bf 93       	push	r27
      428:	ef 93       	push	r30
      42a:	ff 93       	push	r31
-	handle_message();
      42c:	0e 94 df 01 	call	0x3be	; 0x3be <handle_message>
-}
      430:	ff 91       	pop	r31
      432:	ef 91       	pop	r30
      434:	bf 91       	pop	r27
@@ -620,105 +568,53 @@ ISR(INT1_vect){
      450:	18 95       	reti
 
 00000452 <SPI_init>:
-#define SCK		PB7
-#define SS		PB4
-
-void SPI_init(){
-	//Datadir: MOSI (== PB5) out, SCK (== PB7) out, !SS (== PB4) out
-	DDRB = (1<<MOSI)|(1<<SCK)|(1<<SS);
      452:	80 eb       	ldi	r24, 0xB0	; 176
      454:	87 bb       	out	0x17, r24	; 23
-	//Enable SPI and Master, and set clock rate to fck/16
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
      456:	81 e5       	ldi	r24, 0x51	; 81
      458:	8d b9       	out	0x0d, r24	; 13
      45a:	08 95       	ret
 
 0000045c <SPI_transmit>:
-}
-uint8_t SPI_transmit(uint8_t data){
-	// start transmission
-	SPDR = data;
      45c:	8f b9       	out	0x0f, r24	; 15
-	//Wait for data to be ent and receved
-	while(!(SPSR & (1<<SPIF)));
      45e:	77 9b       	sbis	0x0e, 7	; 14
      460:	fe cf       	rjmp	.-4      	; 0x45e <SPI_transmit+0x2>
-	//Return answer
-	return SPDR;
      462:	8f b1       	in	r24, 0x0f	; 15
-}
      464:	08 95       	ret
 
 00000466 <SPI_send>:
-
-void SPI_send(uint8_t c){
-	SPI_transmit(c);
      466:	0e 94 2e 02 	call	0x45c	; 0x45c <SPI_transmit>
      46a:	08 95       	ret
 
 0000046c <SPI_receive>:
-}
-
-uint8_t SPI_receive(){
-	return SPI_transmit(0b11001100);
      46c:	8c ec       	ldi	r24, 0xCC	; 204
      46e:	0e 94 2e 02 	call	0x45c	; 0x45c <SPI_transmit>
-}
      472:	08 95       	ret
 
 00000474 <SPI_ss_high>:
-
-void SPI_ss_high(){
-	PORTB |= (1<<SS);
      474:	c4 9a       	sbi	0x18, 4	; 24
      476:	08 95       	ret
 
 00000478 <SPI_ss_low>:
-}
-
-void SPI_ss_low(){
-	PORTB &= ~(1<<SS);
      478:	c4 98       	cbi	0x18, 4	; 24
      47a:	08 95       	ret
 
 0000047c <bus_init>:
-#define INCFILE1_H_
-
-
-void bus_init(void){
-	//Mask out 4 msb of addrBus
-	SFIOR |= (1<<XMM2);
      47c:	80 b7       	in	r24, 0x30	; 48
      47e:	80 62       	ori	r24, 0x20	; 32
      480:	80 bf       	out	0x30, r24	; 48
-	//Enable bus
-	MCUCR |= (1<<SRE);
      482:	85 b7       	in	r24, 0x35	; 53
      484:	80 68       	ori	r24, 0x80	; 128
      486:	85 bf       	out	0x35, r24	; 53
      488:	08 95       	ret
 
 0000048a <main>:
-#include "Driver_files/message_handler.h"
-
-int main(void)
-{
-	//DDRA = 0xFF;
-	uartInit(9600);
      48a:	80 e8       	ldi	r24, 0x80	; 128
      48c:	95 e2       	ldi	r25, 0x25	; 37
      48e:	0e 94 b0 06 	call	0xd60	; 0xd60 <uartInit>
-	bus_init();
      492:	0e 94 3e 02 	call	0x47c	; 0x47c <bus_init>
-	oled_init();
      496:	0e 94 23 05 	call	0xa46	; 0xa46 <oled_init>
-	init_handler();
      49a:	0e 94 d3 01 	call	0x3a6	; 0x3a6 <init_handler>
-	//oled_sram_init();
-	CAN_init();
      49e:	0e 94 70 02 	call	0x4e0	; 0x4e0 <CAN_init>
-	printf("Reset?");
      4a2:	82 e1       	ldi	r24, 0x12	; 18
      4a4:	91 e0       	ldi	r25, 0x01	; 1
      4a6:	9f 93       	push	r25
@@ -726,19 +622,10 @@ int main(void)
      4aa:	0e 94 c9 11 	call	0x2392	; 0x2392 <printf>
      4ae:	0f 90       	pop	r0
      4b0:	0f 90       	pop	r0
-    while(1)
-    {
-		menuSystem();
      4b2:	0e 94 9a 0c 	call	0x1934	; 0x1934 <menuSystem>
      4b6:	fd cf       	rjmp	.-6      	; 0x4b2 <main+0x28>
 
 000004b8 <get_adc>:
-uint8_t get_adc(int channel){
-	volatile char *adc = (char *) 0x1400; // Start address adc
-	uint16_t adc_size = 0x400;
-	
-	
-	adc[0] = 4 + (channel%4);
      4b8:	83 70       	andi	r24, 0x03	; 3
      4ba:	90 78       	andi	r25, 0x80	; 128
      4bc:	99 23       	and	r25, r25
@@ -761,38 +648,22 @@ uint8_t get_adc(int channel){
      4d4:	f1 f7       	brne	.-4      	; 0x4d2 <get_adc+0x1a>
      4d6:	00 c0       	rjmp	.+0      	; 0x4d8 <get_adc+0x20>
      4d8:	00 00       	nop
-	_delay_us(200);
-	return adc[0];
      4da:	80 91 00 14 	lds	r24, 0x1400
      4de:	08 95       	ret
 
 000004e0 <CAN_init>:
-#include "CAN_driver.h"
-#include "MCP_driver.h"
-
-
-int CAN_init(){
-	MCP_init();
      4e0:	0e 94 b8 04 	call	0x970	; 0x970 <MCP_init>
-	//Enter config mode
-	MCP_reset();
      4e4:	0e 94 9e 04 	call	0x93c	; 0x93c <MCP_reset>
-	//set normal mode on CANCTRL
-	MCP_bit_modify(MCP_CANCTRL, MODE_MASK, MODE_NORMAL);
      4e8:	40 e0       	ldi	r20, 0x00	; 0
      4ea:	60 ee       	ldi	r22, 0xE0	; 224
      4ec:	8f e0       	ldi	r24, 0x0F	; 15
      4ee:	0e 94 09 05 	call	0xa12	; 0xa12 <MCP_bit_modify>
-	//Enable receve interrupt
-	MCP_bit_modify(MCP_CANINTE, MCP_RX_INT, 0xFF);
      4f2:	4f ef       	ldi	r20, 0xFF	; 255
      4f4:	63 e0       	ldi	r22, 0x03	; 3
      4f6:	8b e2       	ldi	r24, 0x2B	; 43
      4f8:	0e 94 09 05 	call	0xa12	; 0xa12 <MCP_bit_modify>
-	uint8_t value = MCP_read(MCP_CANSTAT);
      4fc:	8e e0       	ldi	r24, 0x0E	; 14
      4fe:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
-	if ((value & MODE_MASK) != MODE_NORMAL){
      502:	28 2f       	mov	r18, r24
      504:	20 7e       	andi	r18, 0xE0	; 224
      506:	81 e0       	ldi	r24, 0x01	; 1
@@ -800,21 +671,13 @@ int CAN_init(){
      50a:	11 f4       	brne	.+4      	; 0x510 <__stack+0x11>
      50c:	80 e0       	ldi	r24, 0x00	; 0
      50e:	90 e0       	ldi	r25, 0x00	; 0
-		return 1;
-	}
-	return 0;
-}
      510:	08 95       	ret
 
 00000512 <CAN_transmit>:
-
-void CAN_transmit(Message *m){
      512:	1f 93       	push	r17
      514:	cf 93       	push	r28
      516:	df 93       	push	r29
      518:	ec 01       	movw	r28, r24
-	//Write id to register
-	MCP_bit_modify(MCP_TXB0SIDL, 0xE0, m->id<<5);
      51a:	48 81       	ld	r20, Y
      51c:	42 95       	swap	r20
      51e:	44 0f       	add	r20, r20
@@ -822,7 +685,6 @@ void CAN_transmit(Message *m){
      522:	60 ee       	ldi	r22, 0xE0	; 224
      524:	82 e3       	ldi	r24, 0x32	; 50
      526:	0e 94 09 05 	call	0xa12	; 0xa12 <MCP_bit_modify>
-	MCP_bit_modify(MCP_TXB0SIDH, 0xFF, m->id>>3);
      52a:	48 81       	ld	r20, Y
      52c:	46 95       	lsr	r20
      52e:	46 95       	lsr	r20
@@ -830,25 +692,16 @@ void CAN_transmit(Message *m){
      532:	6f ef       	ldi	r22, 0xFF	; 255
      534:	81 e3       	ldi	r24, 0x31	; 49
      536:	0e 94 09 05 	call	0xa12	; 0xa12 <MCP_bit_modify>
-	
-	//Write length to register
-	MCP_write(MCP_TXB0DLC, m->length);
      53a:	69 81       	ldd	r22, Y+1	; 0x01
      53c:	85 e3       	ldi	r24, 0x35	; 53
      53e:	0e 94 d4 04 	call	0x9a8	; 0x9a8 <MCP_write>
-	
-	//Write length to register
-	MCP_write(MCP_TXB0DLC, m->length);
      542:	69 81       	ldd	r22, Y+1	; 0x01
      544:	85 e3       	ldi	r24, 0x35	; 53
      546:	0e 94 d4 04 	call	0x9a8	; 0x9a8 <MCP_write>
-	//Write data to register
-	for (uint8_t i = 0; i < m->length; i++){
      54a:	89 81       	ldd	r24, Y+1	; 0x01
      54c:	88 23       	and	r24, r24
      54e:	69 f0       	breq	.+26     	; 0x56a <CAN_transmit+0x58>
      550:	10 e0       	ldi	r17, 0x00	; 0
-		MCP_write(MCP_TXB0D0 + i, m->data[i]);
      552:	fe 01       	movw	r30, r28
      554:	e1 0f       	add	r30, r17
      556:	f1 1d       	adc	r31, r1
@@ -856,50 +709,29 @@ void CAN_transmit(Message *m){
      55a:	86 e3       	ldi	r24, 0x36	; 54
      55c:	81 0f       	add	r24, r17
      55e:	0e 94 d4 04 	call	0x9a8	; 0x9a8 <MCP_write>
-	MCP_write(MCP_TXB0DLC, m->length);
-	
-	//Write length to register
-	MCP_write(MCP_TXB0DLC, m->length);
-	//Write data to register
-	for (uint8_t i = 0; i < m->length; i++){
      562:	1f 5f       	subi	r17, 0xFF	; 255
      564:	89 81       	ldd	r24, Y+1	; 0x01
      566:	18 17       	cp	r17, r24
      568:	a0 f3       	brcs	.-24     	; 0x552 <CAN_transmit+0x40>
-		MCP_write(MCP_TXB0D0 + i, m->data[i]);
-	}
-	
-	//Send SPI RTS
-	MCP_rts(0);
      56a:	80 e0       	ldi	r24, 0x00	; 0
      56c:	0e 94 e8 04 	call	0x9d0	; 0x9d0 <MCP_rts>
-	
-	//set !TXnRTS low of transmit register
-}
      570:	df 91       	pop	r29
      572:	cf 91       	pop	r28
      574:	1f 91       	pop	r17
      576:	08 95       	ret
 
 00000578 <CAN_receive>:
-
-int CAN_receive(Message *m){
      578:	1f 93       	push	r17
      57a:	cf 93       	push	r28
      57c:	df 93       	push	r29
      57e:	ec 01       	movw	r28, r24
-	//IF interrupt flag high
-	if (MCP_read(MCP_CANINTF) & MCP_RX0IF){
      580:	8c e2       	ldi	r24, 0x2C	; 44
      582:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
      586:	80 ff       	sbrs	r24, 0
      588:	2c c0       	rjmp	.+88     	; 0x5e2 <CAN_receive+0x6a>
-		m->length = MCP_read(MCP_RBB0DLC);
      58a:	85 e6       	ldi	r24, 0x65	; 101
      58c:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
      590:	89 83       	std	Y+1, r24	; 0x01
-		//Get lower id
-		m->id = (MCP_read(MCP_RXB0SIDL) >> 5)&0x07;
      592:	82 e6       	ldi	r24, 0x62	; 98
      594:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
      598:	18 2f       	mov	r17, r24
@@ -907,7 +739,6 @@ int CAN_receive(Message *m){
      59c:	16 95       	lsr	r17
      59e:	17 70       	andi	r17, 0x07	; 7
      5a0:	18 83       	st	Y, r17
-		m->id += (MCP_read(MCP_RXB0SIDH) << 3);
      5a2:	81 e6       	ldi	r24, 0x61	; 97
      5a4:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
      5a8:	88 0f       	add	r24, r24
@@ -915,12 +746,10 @@ int CAN_receive(Message *m){
      5ac:	88 0f       	add	r24, r24
      5ae:	18 0f       	add	r17, r24
      5b0:	18 83       	st	Y, r17
-		for(uint8_t i = 0; i < m->length; i++){
      5b2:	89 81       	ldd	r24, Y+1	; 0x01
      5b4:	88 23       	and	r24, r24
      5b6:	69 f0       	breq	.+26     	; 0x5d2 <CAN_receive+0x5a>
      5b8:	10 e0       	ldi	r17, 0x00	; 0
-			m->data[i] = MCP_read(MCP_RXB0D0 + i);
      5ba:	86 e6       	ldi	r24, 0x66	; 102
      5bc:	81 0f       	add	r24, r17
      5be:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
@@ -928,67 +757,37 @@ int CAN_receive(Message *m){
      5c4:	e1 0f       	add	r30, r17
      5c6:	f1 1d       	adc	r31, r1
      5c8:	82 83       	std	Z+2, r24	; 0x02
-	if (MCP_read(MCP_CANINTF) & MCP_RX0IF){
-		m->length = MCP_read(MCP_RBB0DLC);
-		//Get lower id
-		m->id = (MCP_read(MCP_RXB0SIDL) >> 5)&0x07;
-		m->id += (MCP_read(MCP_RXB0SIDH) << 3);
-		for(uint8_t i = 0; i < m->length; i++){
      5ca:	1f 5f       	subi	r17, 0xFF	; 255
      5cc:	89 81       	ldd	r24, Y+1	; 0x01
      5ce:	18 17       	cp	r17, r24
      5d0:	a0 f3       	brcs	.-24     	; 0x5ba <CAN_receive+0x42>
-			m->data[i] = MCP_read(MCP_RXB0D0 + i);
-		}
-		
-		//Set intrupt flag low to indicate that message is read
-		MCP_bit_modify(MCP_CANINTF, MCP_RX0IF, 0);
      5d2:	40 e0       	ldi	r20, 0x00	; 0
      5d4:	61 e0       	ldi	r22, 0x01	; 1
      5d6:	8c e2       	ldi	r24, 0x2C	; 44
      5d8:	0e 94 09 05 	call	0xa12	; 0xa12 <MCP_bit_modify>
-		return 0;
      5dc:	80 e0       	ldi	r24, 0x00	; 0
      5de:	90 e0       	ldi	r25, 0x00	; 0
      5e0:	02 c0       	rjmp	.+4      	; 0x5e6 <CAN_receive+0x6e>
-	}
-	return 1;
      5e2:	81 e0       	ldi	r24, 0x01	; 1
      5e4:	90 e0       	ldi	r25, 0x00	; 0
-}
      5e6:	df 91       	pop	r29
      5e8:	cf 91       	pop	r28
      5ea:	1f 91       	pop	r17
      5ec:	08 95       	ret
 
 000005ee <getSliderPosition>:
-#include <util/delay.h>
-
-float xMean = 127;
-float yMean = 127;
-
-Slider getSliderPosition(){
      5ee:	0f 93       	push	r16
      5f0:	1f 93       	push	r17
      5f2:	cf 93       	push	r28
      5f4:	df 93       	push	r29
-	Slider slide;
-	slide.left = ((get_adc(1))*100)/255;
      5f6:	81 e0       	ldi	r24, 0x01	; 1
      5f8:	90 e0       	ldi	r25, 0x00	; 0
      5fa:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
      5fe:	8c 01       	movw	r16, r24
-	slide.right = ((get_adc(0))*100)/255;
      600:	80 e0       	ldi	r24, 0x00	; 0
      602:	90 e0       	ldi	r25, 0x00	; 0
      604:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
      608:	ec 01       	movw	r28, r24
-float xMean = 127;
-float yMean = 127;
-
-Slider getSliderPosition(){
-	Slider slide;
-	slide.left = ((get_adc(1))*100)/255;
      60a:	44 e6       	ldi	r20, 0x64	; 100
      60c:	40 9f       	mul	r20, r16
      60e:	c0 01       	movw	r24, r0
@@ -999,25 +798,15 @@ Slider getSliderPosition(){
      618:	f0 e0       	ldi	r31, 0x00	; 0
      61a:	bf 01       	movw	r22, r30
      61c:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
-	slide.right = ((get_adc(0))*100)/255;
-	return slide;
      620:	8b 01       	movw	r16, r22
-float yMean = 127;
-
-Slider getSliderPosition(){
-	Slider slide;
-	slide.left = ((get_adc(1))*100)/255;
-	slide.right = ((get_adc(0))*100)/255;
      622:	4c 9f       	mul	r20, r28
      624:	c0 01       	movw	r24, r0
      626:	4d 9f       	mul	r20, r29
      628:	90 0d       	add	r25, r0
      62a:	11 24       	eor	r1, r1
-	return slide;
      62c:	bf 01       	movw	r22, r30
      62e:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
      632:	9b 01       	movw	r18, r22
-}
      634:	c9 01       	movw	r24, r18
      636:	b8 01       	movw	r22, r16
      638:	df 91       	pop	r29
@@ -1027,12 +816,6 @@ Slider getSliderPosition(){
      640:	08 95       	ret
 
 00000642 <getJoystickDirection>:
-	joy.X = ((get_adc(3)-xMean)*100)/xMean;
-	joy.D = getJoystickDirection(joy.X, joy.Y);
-	return joy;
-}
-
-direction getJoystickDirection(int x, int y){
      642:	cf 92       	push	r12
      644:	df 92       	push	r13
      646:	ef 92       	push	r14
@@ -1043,8 +826,6 @@ direction getJoystickDirection(int x, int y){
      650:	df 93       	push	r29
      652:	8c 01       	movw	r16, r24
      654:	eb 01       	movw	r28, r22
-	
-	if(fabs(x) < 50 && fabs(y) < 50){
      656:	bc 01       	movw	r22, r24
      658:	88 27       	eor	r24, r24
      65a:	77 fd       	sbrc	r23, 7
@@ -1078,10 +859,6 @@ direction getJoystickDirection(int x, int y){
      698:	0e 94 da 0d 	call	0x1bb4	; 0x1bb4 <__cmpsf2>
      69c:	88 23       	and	r24, r24
      69e:	dc f0       	brlt	.+54     	; 0x6d6 <getJoystickDirection+0x94>
-		return NEUTRAL;
-	}
-	
-	if(fabs(x) < fabs(y)){
      6a0:	be 01       	movw	r22, r28
      6a2:	88 27       	eor	r24, r24
      6a4:	77 fd       	sbrc	r23, 7
@@ -1096,46 +873,20 @@ direction getJoystickDirection(int x, int y){
      6b8:	0e 94 da 0d 	call	0x1bb4	; 0x1bb4 <__cmpsf2>
      6bc:	88 23       	and	r24, r24
      6be:	2c f4       	brge	.+10     	; 0x6ca <getJoystickDirection+0x88>
-		if(y > 0){
      6c0:	1c 16       	cp	r1, r28
      6c2:	1d 06       	cpc	r1, r29
      6c4:	54 f4       	brge	.+20     	; 0x6da <getJoystickDirection+0x98>
-			return UP;
      6c6:	82 e0       	ldi	r24, 0x02	; 2
      6c8:	09 c0       	rjmp	.+18     	; 0x6dc <getJoystickDirection+0x9a>
-		else{
-			return DOWN;
-		}
-	}
-	else{
-		if(x > 0){
      6ca:	81 e0       	ldi	r24, 0x01	; 1
      6cc:	10 16       	cp	r1, r16
      6ce:	11 06       	cpc	r1, r17
      6d0:	2c f0       	brlt	.+10     	; 0x6dc <getJoystickDirection+0x9a>
      6d2:	80 e0       	ldi	r24, 0x00	; 0
      6d4:	03 c0       	rjmp	.+6      	; 0x6dc <getJoystickDirection+0x9a>
-}
-
-direction getJoystickDirection(int x, int y){
-	
-	if(fabs(x) < 50 && fabs(y) < 50){
-		return NEUTRAL;
      6d6:	84 e0       	ldi	r24, 0x04	; 4
      6d8:	01 c0       	rjmp	.+2      	; 0x6dc <getJoystickDirection+0x9a>
-	if(fabs(x) < fabs(y)){
-		if(y > 0){
-			return UP;
-		}
-		else{
-			return DOWN;
      6da:	83 e0       	ldi	r24, 0x03	; 3
-		}
-		else{
-			return LEFT;
-		} 
-	}
-}
      6dc:	df 91       	pop	r29
      6de:	cf 91       	pop	r28
      6e0:	1f 91       	pop	r17
@@ -1147,19 +898,11 @@ direction getJoystickDirection(int x, int y){
      6ec:	08 95       	ret
 
 000006ee <getJoystickPosition>:
-	slide.left = ((get_adc(1))*100)/255;
-	slide.right = ((get_adc(0))*100)/255;
-	return slide;
-}
-
-Joystick getJoystickPosition(){
      6ee:	cf 92       	push	r12
      6f0:	df 92       	push	r13
      6f2:	ef 92       	push	r14
      6f4:	ff 92       	push	r15
      6f6:	cf 93       	push	r28
-	Joystick joy;
-	joy.Y = ((get_adc(2)-yMean)*100)/yMean;
      6f8:	82 e0       	ldi	r24, 0x02	; 2
      6fa:	90 e0       	ldi	r25, 0x00	; 0
      6fc:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
@@ -1186,7 +929,6 @@ Joystick getJoystickPosition(){
      736:	0e 94 de 0d 	call	0x1bbc	; 0x1bbc <__divsf3>
      73a:	0e 94 46 0e 	call	0x1c8c	; 0x1c8c <__fixsfsi>
      73e:	c6 2f       	mov	r28, r22
-	joy.X = ((get_adc(3)-xMean)*100)/xMean;
      740:	83 e0       	ldi	r24, 0x03	; 3
      742:	90 e0       	ldi	r25, 0x00	; 0
      744:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
@@ -1213,7 +955,6 @@ Joystick getJoystickPosition(){
      77e:	0e 94 de 0d 	call	0x1bbc	; 0x1bbc <__divsf3>
      782:	0e 94 46 0e 	call	0x1c8c	; 0x1c8c <__fixsfsi>
      786:	f6 2e       	mov	r15, r22
-	joy.D = getJoystickDirection(joy.X, joy.Y);
      788:	6c 2f       	mov	r22, r28
      78a:	77 27       	eor	r23, r23
      78c:	67 fd       	sbrc	r22, 7
@@ -1223,8 +964,6 @@ Joystick getJoystickPosition(){
      794:	87 fd       	sbrc	r24, 7
      796:	90 95       	com	r25
      798:	0e 94 21 03 	call	0x642	; 0x642 <getJoystickDirection>
-	return joy;
-}
      79c:	6f 2d       	mov	r22, r15
      79e:	7c 2f       	mov	r23, r28
      7a0:	cf 91       	pop	r28
@@ -1235,18 +974,11 @@ Joystick getJoystickPosition(){
      7aa:	08 95       	ret
 
 000007ac <calibration_visual_countdown>:
-	yMean = (yMax - yMin)/2.0;
-	xMean = (xMax - xMin)/2.0;
-	printf("%i %i %i %i", yMin, yMax, xMin, xMax);
-}
-
-void calibration_visual_countdown(int i){
      7ac:	cf 93       	push	r28
      7ae:	df 93       	push	r29
      7b0:	1f 92       	push	r1
      7b2:	cd b7       	in	r28, 0x3d	; 61
      7b4:	de b7       	in	r29, 0x3e	; 62
-	char c = (1000-i)/200 + 48;
      7b6:	28 ee       	ldi	r18, 0xE8	; 232
      7b8:	33 e0       	ldi	r19, 0x03	; 3
      7ba:	a9 01       	movw	r20, r18
@@ -1258,11 +990,9 @@ void calibration_visual_countdown(int i){
      7c6:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
      7ca:	60 5d       	subi	r22, 0xD0	; 208
      7cc:	69 83       	std	Y+1, r22	; 0x01
-	oled_sram_clear_screen(0);
      7ce:	80 e0       	ldi	r24, 0x00	; 0
      7d0:	90 e0       	ldi	r25, 0x00	; 0
      7d2:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	oled_sram_write_string(0,"Move Joystick",0);
      7d6:	40 e0       	ldi	r20, 0x00	; 0
      7d8:	50 e0       	ldi	r21, 0x00	; 0
      7da:	69 e1       	ldi	r22, 0x19	; 25
@@ -1270,7 +1000,6 @@ void calibration_visual_countdown(int i){
      7de:	80 e0       	ldi	r24, 0x00	; 0
      7e0:	90 e0       	ldi	r25, 0x00	; 0
      7e2:	0e 94 b1 05 	call	0xb62	; 0xb62 <oled_sram_write_string>
-	oled_sram_write_string(0,"Time left: ", 2);
      7e6:	42 e0       	ldi	r20, 0x02	; 2
      7e8:	50 e0       	ldi	r21, 0x00	; 0
      7ea:	67 e2       	ldi	r22, 0x27	; 39
@@ -1278,7 +1007,6 @@ void calibration_visual_countdown(int i){
      7ee:	80 e0       	ldi	r24, 0x00	; 0
      7f0:	90 e0       	ldi	r25, 0x00	; 0
      7f2:	0e 94 b1 05 	call	0xb62	; 0xb62 <oled_sram_write_string>
-	oled_sram_write_char(0, &c, 2, 12*8); //writes count after "Time left: "
      7f6:	20 e6       	ldi	r18, 0x60	; 96
      7f8:	30 e0       	ldi	r19, 0x00	; 0
      7fa:	42 e0       	ldi	r20, 0x02	; 2
@@ -1289,7 +1017,6 @@ void calibration_visual_countdown(int i){
      804:	80 e0       	ldi	r24, 0x00	; 0
      806:	90 e0       	ldi	r25, 0x00	; 0
      808:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-	oled_sram_flush(0);
      80c:	80 e0       	ldi	r24, 0x00	; 0
      80e:	90 e0       	ldi	r25, 0x00	; 0
      810:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
@@ -1299,12 +1026,6 @@ void calibration_visual_countdown(int i){
      81a:	08 95       	ret
 
 0000081c <calibrateJoystick>:
-			return LEFT;
-		} 
-	}
-}
-
-void calibrateJoystick(){
      81c:	bf 92       	push	r11
      81e:	cf 92       	push	r12
      820:	df 92       	push	r13
@@ -1314,81 +1035,33 @@ void calibrateJoystick(){
      828:	1f 93       	push	r17
      82a:	cf 93       	push	r28
      82c:	df 93       	push	r29
-	uint8_t yMax = 127;
-	uint8_t yMin = 127;
-	uint8_t xMax = 127;
-	uint8_t xMin = 127;
-	for (int i = 0; i < 1000; i++)
      82e:	e1 2c       	mov	r14, r1
      830:	f1 2c       	mov	r15, r1
-
-void calibrateJoystick(){
-	uint8_t yMax = 127;
-	uint8_t yMin = 127;
-	uint8_t xMax = 127;
-	uint8_t xMin = 127;
      832:	1f e7       	ldi	r17, 0x7F	; 127
-}
-
-void calibrateJoystick(){
-	uint8_t yMax = 127;
-	uint8_t yMin = 127;
-	uint8_t xMax = 127;
      834:	0f e7       	ldi	r16, 0x7F	; 127
-	}
-}
-
-void calibrateJoystick(){
-	uint8_t yMax = 127;
-	uint8_t yMin = 127;
      836:	cf e7       	ldi	r28, 0x7F	; 127
-		} 
-	}
-}
-
-void calibrateJoystick(){
-	uint8_t yMax = 127;
      838:	df e7       	ldi	r29, 0x7F	; 127
-		xMin = (x < xMin) ? x : xMin;
-		
-		xMax = (x > xMax) ? x : xMax;
-		yMax = (y > yMax) ? y : yMax;
-		_delay_ms(5);
-		if (i%200 == 0){
      83a:	0f 2e       	mov	r0, r31
      83c:	f8 ec       	ldi	r31, 0xC8	; 200
      83e:	cf 2e       	mov	r12, r31
      840:	d1 2c       	mov	r13, r1
      842:	f0 2d       	mov	r31, r0
-	uint8_t yMin = 127;
-	uint8_t xMax = 127;
-	uint8_t xMin = 127;
-	for (int i = 0; i < 1000; i++)
-	{
-		uint8_t y = get_adc(2);
      844:	82 e0       	ldi	r24, 0x02	; 2
      846:	90 e0       	ldi	r25, 0x00	; 0
      848:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
      84c:	b8 2e       	mov	r11, r24
-		uint8_t x = get_adc(3);
      84e:	83 e0       	ldi	r24, 0x03	; 3
      850:	90 e0       	ldi	r25, 0x00	; 0
      852:	0e 94 5c 02 	call	0x4b8	; 0x4b8 <get_adc>
-		
-		yMin = (y < yMin) ? y : yMin;
      856:	bc 16       	cp	r11, r28
      858:	08 f4       	brcc	.+2      	; 0x85c <calibrateJoystick+0x40>
      85a:	cb 2d       	mov	r28, r11
-		xMin = (x < xMin) ? x : xMin;
      85c:	81 17       	cp	r24, r17
      85e:	08 f4       	brcc	.+2      	; 0x862 <calibrateJoystick+0x46>
      860:	18 2f       	mov	r17, r24
-		
-		xMax = (x > xMax) ? x : xMax;
      862:	08 17       	cp	r16, r24
      864:	08 f4       	brcc	.+2      	; 0x868 <calibrateJoystick+0x4c>
      866:	08 2f       	mov	r16, r24
-		yMax = (y > yMax) ? y : yMax;
      868:	db 15       	cp	r29, r11
      86a:	08 f4       	brcc	.+2      	; 0x86e <calibrateJoystick+0x52>
      86c:	db 2d       	mov	r29, r11
@@ -1404,22 +1077,13 @@ void calibrateJoystick(){
      874:	f1 f7       	brne	.-4      	; 0x872 <calibrateJoystick+0x56>
      876:	00 c0       	rjmp	.+0      	; 0x878 <calibrateJoystick+0x5c>
      878:	00 00       	nop
-		_delay_ms(5);
-		if (i%200 == 0){
      87a:	c7 01       	movw	r24, r14
      87c:	b6 01       	movw	r22, r12
      87e:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
      882:	89 2b       	or	r24, r25
      884:	19 f4       	brne	.+6      	; 0x88c <calibrateJoystick+0x70>
-			calibration_visual_countdown(i);
      886:	c7 01       	movw	r24, r14
      888:	0e 94 d6 03 	call	0x7ac	; 0x7ac <calibration_visual_countdown>
-void calibrateJoystick(){
-	uint8_t yMax = 127;
-	uint8_t yMin = 127;
-	uint8_t xMax = 127;
-	uint8_t xMin = 127;
-	for (int i = 0; i < 1000; i++)
      88c:	9f ef       	ldi	r25, 0xFF	; 255
      88e:	e9 1a       	sub	r14, r25
      890:	f9 0a       	sbc	r15, r25
@@ -1428,12 +1092,6 @@ void calibrateJoystick(){
      896:	83 e0       	ldi	r24, 0x03	; 3
      898:	f8 06       	cpc	r15, r24
      89a:	a1 f6       	brne	.-88     	; 0x844 <calibrateJoystick+0x28>
-		if (i%200 == 0){
-			calibration_visual_countdown(i);
-		}
-	}
-	
-	yMean = (yMax - yMin)/2.0;
      89c:	6d 2f       	mov	r22, r29
      89e:	70 e0       	ldi	r23, 0x00	; 0
      8a0:	6c 1b       	sub	r22, r28
@@ -1452,7 +1110,6 @@ void calibrateJoystick(){
      8c0:	70 93 0b 01 	sts	0x010B, r23
      8c4:	80 93 0c 01 	sts	0x010C, r24
      8c8:	90 93 0d 01 	sts	0x010D, r25
-	xMean = (xMax - xMin)/2.0;
      8cc:	60 2f       	mov	r22, r16
      8ce:	70 e0       	ldi	r23, 0x00	; 0
      8d0:	61 1b       	sub	r22, r17
@@ -1471,7 +1128,6 @@ void calibrateJoystick(){
      8f0:	70 93 0f 01 	sts	0x010F, r23
      8f4:	80 93 10 01 	sts	0x0110, r24
      8f8:	90 93 11 01 	sts	0x0111, r25
-	printf("%i %i %i %i", yMin, yMax, xMin, xMax);
      8fc:	1f 92       	push	r1
      8fe:	0f 93       	push	r16
      900:	1f 92       	push	r1
@@ -1493,7 +1149,6 @@ void calibrateJoystick(){
      922:	9e bf       	out	0x3e, r25	; 62
      924:	0f be       	out	0x3f, r0	; 63
      926:	8d bf       	out	0x3d, r24	; 61
-}
      928:	df 91       	pop	r29
      92a:	cf 91       	pop	r28
      92c:	1f 91       	pop	r17
@@ -1506,193 +1161,73 @@ void calibrateJoystick(){
      93a:	08 95       	ret
 
 0000093c <MCP_reset>:
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
-	}
-	else{
-		SPI_ss_low();
      93c:	0e 94 3c 02 	call	0x478	; 0x478 <SPI_ss_low>
-	}
-}
-
-void MCP_reset(){
-	toggle_cs(0); //CS low
-	SPI_transmit(MCP_RESET); // sen reset command 0b11000000
      940:	80 ec       	ldi	r24, 0xC0	; 192
      942:	0e 94 2e 02 	call	0x45c	; 0x45c <SPI_transmit>
-	return 0;
-}
-
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
      946:	0e 94 3a 02 	call	0x474	; 0x474 <SPI_ss_high>
      94a:	08 95       	ret
 
 0000094c <MCP_read>:
-	toggle_cs(0); //CS low
-	SPI_transmit(MCP_RESET); // sen reset command 0b11000000
-	toggle_cs(1); //CS high
-}
-
-uint8_t MCP_read(uint8_t address){
      94c:	cf 93       	push	r28
      94e:	c8 2f       	mov	r28, r24
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
-	}
-	else{
-		SPI_ss_low();
      950:	0e 94 3c 02 	call	0x478	; 0x478 <SPI_ss_low>
-	toggle_cs(1); //CS high
-}
-
-uint8_t MCP_read(uint8_t address){
-	toggle_cs(0);
-	SPI_send(MCP_READ); //Send read command 0b00000011
      954:	83 e0       	ldi	r24, 0x03	; 3
      956:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(address);
      95a:	8c 2f       	mov	r24, r28
      95c:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	uint8_t data = SPI_receive();
      960:	0e 94 36 02 	call	0x46c	; 0x46c <SPI_receive>
      964:	c8 2f       	mov	r28, r24
-	return 0;
-}
-
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
      966:	0e 94 3a 02 	call	0x474	; 0x474 <SPI_ss_high>
-	SPI_send(MCP_READ); //Send read command 0b00000011
-	SPI_send(address);
-	uint8_t data = SPI_receive();
-	toggle_cs(1);
-	return data;
-}
      96a:	8c 2f       	mov	r24, r28
      96c:	cf 91       	pop	r28
      96e:	08 95       	ret
 
 00000970 <MCP_init>:
-#include "SPI_driver.h"
-
-
-int MCP_init(){
-	//Using printf in MPC_init
-	uartInit(9600);
      970:	80 e8       	ldi	r24, 0x80	; 128
      972:	95 e2       	ldi	r25, 0x25	; 37
      974:	0e 94 b0 06 	call	0xd60	; 0xd60 <uartInit>
-	
-	//Start SPI driver
-	SPI_init();
      978:	0e 94 29 02 	call	0x452	; 0x452 <SPI_init>
-	
-	//Reset MPC to enter configuration mode
-	MCP_reset();
      97c:	0e 94 9e 04 	call	0x93c	; 0x93c <MCP_reset>
-	
-	// Self-test
-	uint8_t value = MCP_read(MCP_CANSTAT);
      980:	8e e0       	ldi	r24, 0x0E	; 14
      982:	0e 94 a6 04 	call	0x94c	; 0x94c <MCP_read>
-	if ((value & MODE_MASK) != MODE_CONFIG) {
      986:	80 7e       	andi	r24, 0xE0	; 224
      988:	80 38       	cpi	r24, 0x80	; 128
      98a:	59 f0       	breq	.+22     	; 0x9a2 <MCP_init+0x32>
-		printf("MCP2515 is NOT in configuration mode after reset!\n\r");
      98c:	8f e3       	ldi	r24, 0x3F	; 63
      98e:	91 e0       	ldi	r25, 0x01	; 1
      990:	9f 93       	push	r25
      992:	8f 93       	push	r24
      994:	0e 94 c9 11 	call	0x2392	; 0x2392 <printf>
-		return 1;
      998:	0f 90       	pop	r0
      99a:	0f 90       	pop	r0
      99c:	81 e0       	ldi	r24, 0x01	; 1
      99e:	90 e0       	ldi	r25, 0x00	; 0
      9a0:	08 95       	ret
-	}
-	return 0;
      9a2:	80 e0       	ldi	r24, 0x00	; 0
      9a4:	90 e0       	ldi	r25, 0x00	; 0
-}
      9a6:	08 95       	ret
 
 000009a8 <MCP_write>:
-	toggle_cs(1);
-	return data;
-}
-
-
-void MCP_write(uint8_t address, uint8_t data){
      9a8:	cf 93       	push	r28
      9aa:	df 93       	push	r29
      9ac:	d8 2f       	mov	r29, r24
      9ae:	c6 2f       	mov	r28, r22
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
-	}
-	else{
-		SPI_ss_low();
      9b0:	0e 94 3c 02 	call	0x478	; 0x478 <SPI_ss_low>
-}
-
-
-void MCP_write(uint8_t address, uint8_t data){
-	toggle_cs(0);
-	SPI_send(MCP_WRITE); //Send write command 0b00000010
      9b4:	82 e0       	ldi	r24, 0x02	; 2
      9b6:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(address);
      9ba:	8d 2f       	mov	r24, r29
      9bc:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(data);
      9c0:	8c 2f       	mov	r24, r28
      9c2:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	return 0;
-}
-
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
      9c6:	0e 94 3a 02 	call	0x474	; 0x474 <SPI_ss_high>
-	toggle_cs(0);
-	SPI_send(MCP_WRITE); //Send write command 0b00000010
-	SPI_send(address);
-	SPI_send(data);
-	toggle_cs(1);
-}
      9ca:	df 91       	pop	r29
      9cc:	cf 91       	pop	r28
      9ce:	08 95       	ret
 
 000009d0 <MCP_rts>:
-
-void MCP_load_tx(){
-	return 0;
-}
-void MCP_rts(uint8_t buffer){
      9d0:	cf 93       	push	r28
      9d2:	c8 2f       	mov	r28, r24
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
-	}
-	else{
-		SPI_ss_low();
      9d4:	0e 94 3c 02 	call	0x478	; 0x478 <SPI_ss_low>
-void MCP_load_tx(){
-	return 0;
-}
-void MCP_rts(uint8_t buffer){
-	toggle_cs(0);
-	switch(buffer%4){ //Select buffer to use, 3 = all
      9d8:	8c 2f       	mov	r24, r28
      9da:	83 70       	andi	r24, 0x03	; 3
      9dc:	81 30       	cpi	r24, 0x01	; 1
@@ -1703,105 +1238,44 @@ void MCP_rts(uint8_t buffer){
      9e6:	83 30       	cpi	r24, 0x03	; 3
      9e8:	69 f0       	breq	.+26     	; 0xa04 <MCP_rts+0x34>
      9ea:	0f c0       	rjmp	.+30     	; 0xa0a <MCP_rts+0x3a>
-		case 0:
-			SPI_send(MCP_RTS_TX0);
      9ec:	81 e8       	ldi	r24, 0x81	; 129
      9ee:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-			break;
      9f2:	0b c0       	rjmp	.+22     	; 0xa0a <MCP_rts+0x3a>
-		case 1:
-			SPI_send(MCP_RTS_TX1);
      9f4:	82 e8       	ldi	r24, 0x82	; 130
      9f6:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-			break;
      9fa:	07 c0       	rjmp	.+14     	; 0xa0a <MCP_rts+0x3a>
-		case 2:
-			SPI_send(MCP_RTS_TX2);
      9fc:	84 e8       	ldi	r24, 0x84	; 132
      9fe:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-			break;
      a02:	03 c0       	rjmp	.+6      	; 0xa0a <MCP_rts+0x3a>
-		case 3:
-			SPI_send(MCP_RTS_ALL);
      a04:	87 e8       	ldi	r24, 0x87	; 135
      a06:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	return 0;
-}
-
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
      a0a:	0e 94 3a 02 	call	0x474	; 0x474 <SPI_ss_high>
-			break;
-		default:
-			break;
-	}
-	toggle_cs(1);
-}
      a0e:	cf 91       	pop	r28
      a10:	08 95       	ret
 
 00000a12 <MCP_bit_modify>:
-	SPI_send(MCP_RX_STATUS); // send read rx status code: 0b10110000
-	uint8_t data = SPI_receive();
-	toggle_cs(1);
-	return data;
-}
-void MCP_bit_modify(uint8_t address, uint8_t mask, uint8_t data){
      a12:	1f 93       	push	r17
      a14:	cf 93       	push	r28
      a16:	df 93       	push	r29
      a18:	18 2f       	mov	r17, r24
      a1a:	d6 2f       	mov	r29, r22
      a1c:	c4 2f       	mov	r28, r20
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
-	}
-	else{
-		SPI_ss_low();
      a1e:	0e 94 3c 02 	call	0x478	; 0x478 <SPI_ss_low>
-	toggle_cs(1);
-	return data;
-}
-void MCP_bit_modify(uint8_t address, uint8_t mask, uint8_t data){
-	toggle_cs(0);
-	SPI_send(MCP_BITMOD); // send bit modify command: 0b00000101
      a22:	85 e0       	ldi	r24, 0x05	; 5
      a24:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(address);
      a28:	81 2f       	mov	r24, r17
      a2a:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(mask);
      a2e:	8d 2f       	mov	r24, r29
      a30:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	SPI_send(data);
      a34:	8c 2f       	mov	r24, r28
      a36:	0e 94 33 02 	call	0x466	; 0x466 <SPI_send>
-	return 0;
-}
-
-void toggle_cs(uint8_t i){
-	if(i){
-		SPI_ss_high();
      a3a:	0e 94 3a 02 	call	0x474	; 0x474 <SPI_ss_high>
-	SPI_send(MCP_BITMOD); // send bit modify command: 0b00000101
-	SPI_send(address);
-	SPI_send(mask);
-	SPI_send(data);
-	toggle_cs(1);
      a3e:	df 91       	pop	r29
      a40:	cf 91       	pop	r28
      a42:	1f 91       	pop	r17
      a44:	08 95       	ret
 
 00000a46 <oled_init>:
-	oled_data[0] = data;
-}
-
-void write_command(uint8_t command){
-	volatile char *oled_command = (char *) 0x1000;
-	oled_command[0] = command;
      a46:	e0 e0       	ldi	r30, 0x00	; 0
      a48:	f0 e1       	ldi	r31, 0x10	; 16
      a4a:	8e ea       	ldi	r24, 0xAE	; 174
@@ -1850,12 +1324,6 @@ void write_command(uint8_t command){
      aa0:	08 95       	ret
 
 00000aa2 <oled_sram_flush>:
-ISR(TIMER1_COMPB_vect){
-	oled_sram_flush(0);
-	TCNT1 = 0;
-}
-
-void oled_sram_flush(int start){
      aa2:	af 92       	push	r10
      aa4:	bf 92       	push	r11
      aa6:	cf 92       	push	r12
@@ -1867,103 +1335,39 @@ void oled_sram_flush(int start){
      ab2:	cf 93       	push	r28
      ab4:	df 93       	push	r29
      ab6:	5c 01       	movw	r10, r24
-	int line = 0;
-	for (int i = 0; i < 128*8; i++){
      ab8:	c0 e0       	ldi	r28, 0x00	; 0
      aba:	d0 e0       	ldi	r29, 0x00	; 0
-	oled_sram_flush(0);
-	TCNT1 = 0;
-}
-
-void oled_sram_flush(int start){
-	int line = 0;
      abc:	e1 2c       	mov	r14, r1
      abe:	f1 2c       	mov	r15, r1
-	oled_data[0] = data;
-}
-
-void write_command(uint8_t command){
-	volatile char *oled_command = (char *) 0x1000;
-	oled_command[0] = command;
      ac0:	c1 2c       	mov	r12, r1
      ac2:	68 94       	set
      ac4:	dd 24       	eor	r13, r13
      ac6:	d4 f8       	bld	r13, 4
-#include <avr/interrupt.h>
-
-
-void write_data(uint8_t data){
-	volatile char *oled_data = (char *) 0x1200;
-	oled_data[0] = data;
      ac8:	00 e0       	ldi	r16, 0x00	; 0
      aca:	12 e1       	ldi	r17, 0x12	; 18
-}
-
-void oled_sram_flush(int start){
-	int line = 0;
-	for (int i = 0; i < 128*8; i++){
-		if(i%128 == 0){
      acc:	ce 01       	movw	r24, r28
      ace:	9e 01       	movw	r18, r28
      ad0:	2f 77       	andi	r18, 0x7F	; 127
      ad2:	33 27       	eor	r19, r19
      ad4:	23 2b       	or	r18, r19
      ad6:	39 f4       	brne	.+14     	; 0xae6 <oled_sram_flush+0x44>
-	oled_pos(0,0);
-}
-
-void oled_goto_line(uint8_t line){
-	//Set Page Start Address for Page Addressing Mode
-	write_command(line + 0xB0);
      ad8:	20 eb       	ldi	r18, 0xB0	; 176
      ada:	2e 0d       	add	r18, r14
-	oled_data[0] = data;
-}
-
-void write_command(uint8_t command){
-	volatile char *oled_command = (char *) 0x1000;
-	oled_command[0] = command;
      adc:	f6 01       	movw	r30, r12
      ade:	20 83       	st	Z, r18
-void oled_sram_flush(int start){
-	int line = 0;
-	for (int i = 0; i < 128*8; i++){
-		if(i%128 == 0){
-			oled_goto_line(line);
-			line++;
      ae0:	ff ef       	ldi	r31, 0xFF	; 255
      ae2:	ef 1a       	sub	r14, r31
      ae4:	ff 0a       	sbc	r15, r31
-		}
-		write_data(getSRAM(i + start));
      ae6:	8a 0d       	add	r24, r10
      ae8:	9b 1d       	adc	r25, r11
      aea:	0e 94 a1 06 	call	0xd42	; 0xd42 <getSRAM>
-#include <avr/interrupt.h>
-
-
-void write_data(uint8_t data){
-	volatile char *oled_data = (char *) 0x1200;
-	oled_data[0] = data;
      aee:	f8 01       	movw	r30, r16
      af0:	80 83       	st	Z, r24
-	TCNT1 = 0;
-}
-
-void oled_sram_flush(int start){
-	int line = 0;
-	for (int i = 0; i < 128*8; i++){
      af2:	21 96       	adiw	r28, 0x01	; 1
      af4:	c1 15       	cp	r28, r1
      af6:	f4 e0       	ldi	r31, 0x04	; 4
      af8:	df 07       	cpc	r29, r31
      afa:	41 f7       	brne	.-48     	; 0xacc <oled_sram_flush+0x2a>
-			oled_goto_line(line);
-			line++;
-		}
-		write_data(getSRAM(i + start));
-	}
-}
      afc:	df 91       	pop	r29
      afe:	cf 91       	pop	r28
      b00:	1f 91       	pop	r17
@@ -1977,12 +1381,6 @@ void oled_sram_flush(int start){
      b10:	08 95       	ret
 
 00000b12 <__vector_14>:
-	TIFR |= (1<< OCF1B); //Output compare
-	TIMSK |= (1 << OCIE1B); // Enable global interrupt on output compare B timer 1
-	sei();
-}
-
-ISR(TIMER1_COMPB_vect){
      b12:	1f 92       	push	r1
      b14:	0f 92       	push	r0
      b16:	0f b6       	in	r0, 0x3f	; 63
@@ -2000,14 +1398,11 @@ ISR(TIMER1_COMPB_vect){
      b2e:	bf 93       	push	r27
      b30:	ef 93       	push	r30
      b32:	ff 93       	push	r31
-	oled_sram_flush(0);
      b34:	80 e0       	ldi	r24, 0x00	; 0
      b36:	90 e0       	ldi	r25, 0x00	; 0
      b38:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
-	TCNT1 = 0;
      b3c:	1d bc       	out	0x2d, r1	; 45
      b3e:	1c bc       	out	0x2c, r1	; 44
-}
      b40:	ff 91       	pop	r31
      b42:	ef 91       	pop	r30
      b44:	bf 91       	pop	r27
@@ -2027,12 +1422,6 @@ ISR(TIMER1_COMPB_vect){
      b60:	18 95       	reti
 
 00000b62 <oled_sram_write_string>:
-void oled_sram_write(int start, int page, int column, uint8_t value){
-	setSRAM(start + page*128 + column, value);
-}
-
-
-void oled_sram_write_string(int start, char *cstr, int page){
      b62:	af 92       	push	r10
      b64:	bf 92       	push	r11
      b66:	cf 92       	push	r12
@@ -2043,7 +1432,6 @@ void oled_sram_write_string(int start, char *cstr, int page){
      b70:	1f 93       	push	r17
      b72:	cf 93       	push	r28
      b74:	df 93       	push	r29
-	start = start + page*128; //Starts at chosen line
      b76:	6a 01       	movw	r12, r20
      b78:	d6 94       	lsr	r13
      b7a:	dc 2c       	mov	r13, r12
@@ -2052,11 +1440,8 @@ void oled_sram_write_string(int start, char *cstr, int page){
      b80:	c7 94       	ror	r12
      b82:	c8 0e       	add	r12, r24
      b84:	d9 1e       	adc	r13, r25
-	int index = 0;
-	char c = cstr[0];
      b86:	fb 01       	movw	r30, r22
      b88:	e0 80       	ld	r14, Z
-	while(c != '\0'){
      b8a:	ee 20       	and	r14, r14
      b8c:	69 f1       	breq	.+90     	; 0xbe8 <oled_sram_write_string+0x86>
      b8e:	5b 01       	movw	r10, r22
@@ -2064,8 +1449,6 @@ void oled_sram_write_string(int start, char *cstr, int page){
      b92:	af 1a       	sub	r10, r31
      b94:	bf 0a       	sbc	r11, r31
      b96:	15 c0       	rjmp	.+42     	; 0xbc2 <oled_sram_write_string+0x60>
-		for(int line = 0; line < 8; line++){
-			setSRAM(start++,pgm_read_byte(&font[c - 32][line]));
      b98:	ce 01       	movw	r24, r28
      b9a:	f7 01       	movw	r30, r14
      b9c:	e8 0f       	add	r30, r24
@@ -2075,30 +1458,15 @@ void oled_sram_write_string(int start, char *cstr, int page){
      ba4:	21 96       	adiw	r28, 0x01	; 1
      ba6:	70 e0       	ldi	r23, 0x00	; 0
      ba8:	0e 94 a5 06 	call	0xd4a	; 0xd4a <setSRAM>
-void oled_sram_write_string(int start, char *cstr, int page){
-	start = start + page*128; //Starts at chosen line
-	int index = 0;
-	char c = cstr[0];
-	while(c != '\0'){
-		for(int line = 0; line < 8; line++){
      bac:	c0 17       	cp	r28, r16
      bae:	d1 07       	cpc	r29, r17
      bb0:	99 f7       	brne	.-26     	; 0xb98 <oled_sram_write_string+0x36>
      bb2:	48 e0       	ldi	r20, 0x08	; 8
      bb4:	c4 0e       	add	r12, r20
      bb6:	d1 1c       	adc	r13, r1
-			setSRAM(start++,pgm_read_byte(&font[c - 32][line]));
-		}
-		c = cstr[++index];
      bb8:	f5 01       	movw	r30, r10
      bba:	e1 90       	ld	r14, Z+
      bbc:	5f 01       	movw	r10, r30
-
-void oled_sram_write_string(int start, char *cstr, int page){
-	start = start + page*128; //Starts at chosen line
-	int index = 0;
-	char c = cstr[0];
-	while(c != '\0'){
      bbe:	ee 20       	and	r14, r14
      bc0:	99 f0       	breq	.+38     	; 0xbe8 <oled_sram_write_string+0x86>
      bc2:	86 01       	movw	r16, r12
@@ -2114,18 +1482,12 @@ void oled_sram_write_string(int start, char *cstr, int page){
      bd6:	97 01       	movw	r18, r14
      bd8:	2c 19       	sub	r18, r12
      bda:	3d 09       	sbc	r19, r13
-		for(int line = 0; line < 8; line++){
-			setSRAM(start++,pgm_read_byte(&font[c - 32][line]));
      bdc:	c6 01       	movw	r24, r12
      bde:	a9 01       	movw	r20, r18
      be0:	40 59       	subi	r20, 0x90	; 144
      be2:	50 40       	sbci	r21, 0x00	; 0
      be4:	7a 01       	movw	r14, r20
      be6:	d9 cf       	rjmp	.-78     	; 0xb9a <oled_sram_write_string+0x38>
-		}
-		c = cstr[++index];
-	}
-}
      be8:	df 91       	pop	r29
      bea:	cf 91       	pop	r28
      bec:	1f 91       	pop	r17
@@ -2139,8 +1501,6 @@ void oled_sram_write_string(int start, char *cstr, int page){
      bfc:	08 95       	ret
 
 00000bfe <oled_sram_write_char>:
-
-void oled_sram_write_char(int start, char *c, int page, int col){
      bfe:	ef 92       	push	r14
      c00:	ff 92       	push	r15
      c02:	0f 93       	push	r16
@@ -2148,7 +1508,6 @@ void oled_sram_write_char(int start, char *c, int page, int col){
      c06:	cf 93       	push	r28
      c08:	df 93       	push	r29
      c0a:	7b 01       	movw	r14, r22
-	start = start + page*128+col;
      c0c:	8a 01       	movw	r16, r20
      c0e:	16 95       	lsr	r17
      c10:	10 2f       	mov	r17, r16
@@ -2160,10 +1519,8 @@ void oled_sram_write_char(int start, char *c, int page, int col){
      c1c:	8c 01       	movw	r16, r24
      c1e:	02 0f       	add	r16, r18
      c20:	13 1f       	adc	r17, r19
-	for(int line = 0; line < 8; line++){
      c22:	c0 e0       	ldi	r28, 0x00	; 0
      c24:	d0 e0       	ldi	r29, 0x00	; 0
-		setSRAM(start++,pgm_read_byte(&font[*c - 32][line]));
      c26:	d7 01       	movw	r26, r14
      c28:	ec 91       	ld	r30, X
      c2a:	f0 e0       	ldi	r31, 0x00	; 0
@@ -2184,19 +1541,10 @@ void oled_sram_write_char(int start, char *c, int page, int col){
      c48:	80 0f       	add	r24, r16
      c4a:	91 1f       	adc	r25, r17
      c4c:	0e 94 a5 06 	call	0xd4a	; 0xd4a <setSRAM>
-	}
-}
-
-void oled_sram_write_char(int start, char *c, int page, int col){
-	start = start + page*128+col;
-	for(int line = 0; line < 8; line++){
      c50:	21 96       	adiw	r28, 0x01	; 1
      c52:	c8 30       	cpi	r28, 0x08	; 8
      c54:	d1 05       	cpc	r29, r1
      c56:	39 f7       	brne	.-50     	; 0xc26 <oled_sram_write_char+0x28>
-		setSRAM(start++,pgm_read_byte(&font[*c - 32][line]));
-	}
-}
      c58:	df 91       	pop	r29
      c5a:	cf 91       	pop	r28
      c5c:	1f 91       	pop	r17
@@ -2206,13 +1554,10 @@ void oled_sram_write_char(int start, char *c, int page, int col){
      c64:	08 95       	ret
 
 00000c66 <oled_sram_clear_line>:
-
-void oled_sram_clear_line(int start, int page){
      c66:	0f 93       	push	r16
      c68:	1f 93       	push	r17
      c6a:	cf 93       	push	r28
      c6c:	df 93       	push	r29
-	start = start + page*128; // Starts on correct page
      c6e:	8b 01       	movw	r16, r22
      c70:	16 95       	lsr	r17
      c72:	10 2f       	mov	r17, r16
@@ -2221,29 +1566,18 @@ void oled_sram_clear_line(int start, int page){
      c78:	07 95       	ror	r16
      c7a:	08 0f       	add	r16, r24
      c7c:	19 1f       	adc	r17, r25
-	for (int i = 0; i < 128; i++){
      c7e:	c0 e0       	ldi	r28, 0x00	; 0
      c80:	d0 e0       	ldi	r29, 0x00	; 0
-		setSRAM(start + i, 0);
      c82:	60 e0       	ldi	r22, 0x00	; 0
      c84:	70 e0       	ldi	r23, 0x00	; 0
      c86:	ce 01       	movw	r24, r28
      c88:	80 0f       	add	r24, r16
      c8a:	91 1f       	adc	r25, r17
      c8c:	0e 94 a5 06 	call	0xd4a	; 0xd4a <setSRAM>
-	}
-}
-
-void oled_sram_clear_line(int start, int page){
-	start = start + page*128; // Starts on correct page
-	for (int i = 0; i < 128; i++){
      c90:	21 96       	adiw	r28, 0x01	; 1
      c92:	c0 38       	cpi	r28, 0x80	; 128
      c94:	d1 05       	cpc	r29, r1
      c96:	a9 f7       	brne	.-22     	; 0xc82 <oled_sram_clear_line+0x1c>
-		setSRAM(start + i, 0);
-	}
-}
      c98:	df 91       	pop	r29
      c9a:	cf 91       	pop	r28
      c9c:	1f 91       	pop	r17
@@ -2251,33 +1585,20 @@ void oled_sram_clear_line(int start, int page){
      ca0:	08 95       	ret
 
 00000ca2 <oled_sram_clear_screen>:
-
-void oled_sram_clear_screen(int start){
      ca2:	0f 93       	push	r16
      ca4:	1f 93       	push	r17
      ca6:	cf 93       	push	r28
      ca8:	df 93       	push	r29
      caa:	8c 01       	movw	r16, r24
-	for (int page = 0; page < 8; page++){
      cac:	c0 e0       	ldi	r28, 0x00	; 0
      cae:	d0 e0       	ldi	r29, 0x00	; 0
-		oled_sram_clear_line(start, page);
      cb0:	be 01       	movw	r22, r28
      cb2:	c8 01       	movw	r24, r16
      cb4:	0e 94 33 06 	call	0xc66	; 0xc66 <oled_sram_clear_line>
-		setSRAM(start + i, 0);
-	}
-}
-
-void oled_sram_clear_screen(int start){
-	for (int page = 0; page < 8; page++){
      cb8:	21 96       	adiw	r28, 0x01	; 1
      cba:	c8 30       	cpi	r28, 0x08	; 8
      cbc:	d1 05       	cpc	r29, r1
      cbe:	c1 f7       	brne	.-16     	; 0xcb0 <oled_sram_clear_screen+0xe>
-		oled_sram_clear_line(start, page);
-	}
-}
      cc0:	df 91       	pop	r29
      cc2:	cf 91       	pop	r28
      cc4:	1f 91       	pop	r17
@@ -2285,18 +1606,11 @@ void oled_sram_clear_screen(int start){
      cc8:	08 95       	ret
 
 00000cca <oled_sram_write_bit>:
-		}
-	}
-	oled_sram_flush(0);
-}
-
-void oled_sram_write_bit(int start, int x, int y){
      cca:	0f 93       	push	r16
      ccc:	1f 93       	push	r17
      cce:	cf 93       	push	r28
      cd0:	df 93       	push	r29
      cd2:	ea 01       	movw	r28, r20
-	int page = y/8;
      cd4:	9a 01       	movw	r18, r20
      cd6:	dd 23       	and	r29, r29
      cd8:	14 f4       	brge	.+4      	; 0xcde <oled_sram_write_bit+0x14>
@@ -2309,8 +1623,6 @@ void oled_sram_write_bit(int start, int x, int y){
      ce6:	07 95       	ror	r16
      ce8:	15 95       	asr	r17
      cea:	07 95       	ror	r16
-	int row = y%8;
-	int index = start + page*128 + x;
      cec:	16 95       	lsr	r17
      cee:	10 2f       	mov	r17, r16
      cf0:	00 27       	eor	r16, r16
@@ -2320,15 +1632,8 @@ void oled_sram_write_bit(int start, int x, int y){
      cf8:	19 1f       	adc	r17, r25
      cfa:	06 0f       	add	r16, r22
      cfc:	17 1f       	adc	r17, r23
-	uint8_t temp = getSRAM( index );
      cfe:	c8 01       	movw	r24, r16
      d00:	0e 94 a1 06 	call	0xd42	; 0xd42 <getSRAM>
-	oled_sram_flush(0);
-}
-
-void oled_sram_write_bit(int start, int x, int y){
-	int page = y/8;
-	int row = y%8;
      d04:	ae 01       	movw	r20, r28
      d06:	47 70       	andi	r20, 0x07	; 7
      d08:	50 78       	andi	r21, 0x80	; 128
@@ -2340,9 +1645,6 @@ void oled_sram_write_bit(int start, int x, int y){
      d14:	5f 6f       	ori	r21, 0xFF	; 255
      d16:	4f 5f       	subi	r20, 0xFF	; 255
      d18:	5f 4f       	sbci	r21, 0xFF	; 255
-	int index = start + page*128 + x;
-	uint8_t temp = getSRAM( index );
-	temp |= (1 << row);
      d1a:	21 e0       	ldi	r18, 0x01	; 1
      d1c:	30 e0       	ldi	r19, 0x00	; 0
      d1e:	b9 01       	movw	r22, r18
@@ -2353,7 +1655,6 @@ void oled_sram_write_bit(int start, int x, int y){
      d28:	e2 f7       	brpl	.-8      	; 0xd22 <oled_sram_write_bit+0x58>
      d2a:	ab 01       	movw	r20, r22
      d2c:	48 2b       	or	r20, r24
-	setSRAM(index, temp);
      d2e:	64 2f       	mov	r22, r20
      d30:	70 e0       	ldi	r23, 0x00	; 0
      d32:	c8 01       	movw	r24, r16
@@ -2365,59 +1666,27 @@ void oled_sram_write_bit(int start, int x, int y){
      d40:	08 95       	ret
 
 00000d42 <getSRAM>:
-	
-}
-
-uint8_t getSRAM(int index){
-	volatile char *ext_ram = (char *) 0x1800;
-	return ext_ram[index];
      d42:	98 5e       	subi	r25, 0xE8	; 232
      d44:	fc 01       	movw	r30, r24
      d46:	80 81       	ld	r24, Z
-}
      d48:	08 95       	ret
 
 00000d4a <setSRAM>:
-
-uint8_t setSRAM(int index, int value){
-		volatile char *ext_ram = (char *) 0x1800;
-		uint8_t temp = ext_ram[index];
      d4a:	fc 01       	movw	r30, r24
      d4c:	f8 5e       	subi	r31, 0xE8	; 232
      d4e:	80 81       	ld	r24, Z
-		ext_ram[index] = value;
      d50:	60 83       	st	Z, r22
-		return temp;
-}
      d52:	08 95       	ret
 
 00000d54 <uartSend>:
-	
-	return 0;
-}
-int uartSend(char c){
-	//Wait for empty buffer
-	while( !( UCSR0A & (1<<UDRE0)) );
      d54:	5d 9b       	sbis	0x0b, 5	; 11
      d56:	fe cf       	rjmp	.-4      	; 0xd54 <uartSend>
-	
-	//Put data into buffer and send it
-	UDR0 = c;
      d58:	8c b9       	out	0x0c, r24	; 12
-	
-	return 0;
-}
      d5a:	80 e0       	ldi	r24, 0x00	; 0
      d5c:	90 e0       	ldi	r25, 0x00	; 0
      d5e:	08 95       	ret
 
 00000d60 <uartInit>:
-#include <stdio.h>
-#include "uart_driver.h"
-
-int uartInit(unsigned int baud){
-	//Calculate ubrr value
-	unsigned int ubrr = F_CPU / 16 / baud - 1;
      d60:	9c 01       	movw	r18, r24
      d62:	40 e0       	ldi	r20, 0x00	; 0
      d64:	50 e0       	ldi	r21, 0x00	; 0
@@ -2428,68 +1697,32 @@ int uartInit(unsigned int baud){
      d6e:	0e 94 a4 0f 	call	0x1f48	; 0x1f48 <__divmodsi4>
      d72:	21 50       	subi	r18, 0x01	; 1
      d74:	31 09       	sbc	r19, r1
-	
-	//Set baud rate
-	UBRR0H = (unsigned char)(ubrr>>8);
      d76:	30 bd       	out	0x20, r19	; 32
-	UBRR0L = (unsigned char) ubrr;
      d78:	29 b9       	out	0x09, r18	; 9
-
-	//Enable receiver and transmitter
-	UCSR0B |= (1<<RXEN0)|(1<<TXEN0);
      d7a:	8a b1       	in	r24, 0x0a	; 10
      d7c:	88 61       	ori	r24, 0x18	; 24
      d7e:	8a b9       	out	0x0a, r24	; 10
-	
-	// 8data, 1stop
-	UCSR0C |= (1<<URSEL0)|(3<<UCSZ00);
      d80:	80 b5       	in	r24, 0x20	; 32
      d82:	86 68       	ori	r24, 0x86	; 134
      d84:	80 bd       	out	0x20, r24	; 32
-	
-	//Enable printf for uart
-	fdevopen(&uartSend, NULL);
      d86:	60 e0       	ldi	r22, 0x00	; 0
      d88:	70 e0       	ldi	r23, 0x00	; 0
      d8a:	8a ea       	ldi	r24, 0xAA	; 170
      d8c:	96 e0       	ldi	r25, 0x06	; 6
      d8e:	0e 94 7e 11 	call	0x22fc	; 0x22fc <fdevopen>
-	
-	return 0;
-}
      d92:	80 e0       	ldi	r24, 0x00	; 0
      d94:	90 e0       	ldi	r25, 0x00	; 0
      d96:	08 95       	ret
 
 00000d98 <play_draw>:
-#include "../Driver_files/oled_driver.h"
-#include "draw.h"
-
-
-void play_draw(){
-	oled_sram_clear_screen(0);
      d98:	80 e0       	ldi	r24, 0x00	; 0
      d9a:	90 e0       	ldi	r25, 0x00	; 0
      d9c:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	int x = 63;
-	int y = 31;
      da0:	0f e1       	ldi	r16, 0x1F	; 31
      da2:	10 e0       	ldi	r17, 0x00	; 0
-#include "draw.h"
-
-
-void play_draw(){
-	oled_sram_clear_screen(0);
-	int x = 63;
      da4:	cf e3       	ldi	r28, 0x3F	; 63
      da6:	d0 e0       	ldi	r29, 0x00	; 0
-	int y = 31;
-	
-	Joystick joy;
-	while (1){
-		joy = getJoystickPosition();
      da8:	0e 94 77 03 	call	0x6ee	; 0x6ee <getJoystickPosition>
-		switch(joy.D){
      dac:	81 30       	cpi	r24, 0x01	; 1
      dae:	71 f0       	breq	.+28     	; 0xdcc <play_draw+0x34>
      db0:	58 f0       	brcs	.+22     	; 0xdc8 <play_draw+0x30>
@@ -2498,39 +1731,20 @@ void play_draw(){
      db6:	83 30       	cpi	r24, 0x03	; 3
      db8:	21 f0       	breq	.+8      	; 0xdc2 <play_draw+0x2a>
      dba:	09 c0       	rjmp	.+18     	; 0xdce <play_draw+0x36>
-			case NEUTRAL:
-				break;
-			case UP:
-				y--;
      dbc:	01 50       	subi	r16, 0x01	; 1
      dbe:	11 09       	sbc	r17, r1
-				break;
      dc0:	06 c0       	rjmp	.+12     	; 0xdce <play_draw+0x36>
-			case DOWN:
-				y++;
      dc2:	0f 5f       	subi	r16, 0xFF	; 255
      dc4:	1f 4f       	sbci	r17, 0xFF	; 255
-				break;
      dc6:	03 c0       	rjmp	.+6      	; 0xdce <play_draw+0x36>
-			case LEFT:
-				x--;
      dc8:	21 97       	sbiw	r28, 0x01	; 1
-				break;
      dca:	01 c0       	rjmp	.+2      	; 0xdce <play_draw+0x36>
-			case RIGHT:
-				x++;
      dcc:	21 96       	adiw	r28, 0x01	; 1
-			break;
-			default:
-			break;
-		}
-		oled_sram_write_bit(0,x,y);
      dce:	a8 01       	movw	r20, r16
      dd0:	be 01       	movw	r22, r28
      dd2:	80 e0       	ldi	r24, 0x00	; 0
      dd4:	90 e0       	ldi	r25, 0x00	; 0
      dd6:	0e 94 65 06 	call	0xcca	; 0xcca <oled_sram_write_bit>
-		oled_sram_flush(0);
      dda:	80 e0       	ldi	r24, 0x00	; 0
      ddc:	90 e0       	ldi	r25, 0x00	; 0
      dde:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
@@ -2546,12 +1760,6 @@ void play_draw(){
      df4:	d9 cf       	rjmp	.-78     	; 0xda8 <play_draw+0x10>
 
 00000df6 <racketHit>:
-
-typedef struct{
-	int pos; // from 0 to 45 (16 in width)
-} Racket;
-
-int racketHit(Ball *ball, int racketPos){
      df6:	cf 92       	push	r12
      df8:	df 92       	push	r13
      dfa:	ef 92       	push	r14
@@ -2559,7 +1767,6 @@ int racketHit(Ball *ball, int racketPos){
      dfe:	cf 93       	push	r28
      e00:	df 93       	push	r29
      e02:	eb 01       	movw	r28, r22
-	if (ball->posY >= racketPos && ball->posY < racketPos + RACKETSIZE )
      e04:	fc 01       	movw	r30, r24
      e06:	c2 80       	ldd	r12, Z+2	; 0x02
      e08:	d3 80       	ldd	r13, Z+3	; 0x03
@@ -2595,14 +1802,11 @@ int racketHit(Ball *ball, int racketPos){
      e4c:	88 23       	and	r24, r24
      e4e:	0c f0       	brlt	.+2      	; 0xe52 <racketHit+0x5c>
      e50:	d0 e0       	ldi	r29, 0x00	; 0
-		return 1;
      e52:	8d 2f       	mov	r24, r29
      e54:	9c 2f       	mov	r25, r28
      e56:	02 c0       	rjmp	.+4      	; 0xe5c <racketHit+0x66>
-	return 0;
      e58:	80 e0       	ldi	r24, 0x00	; 0
      e5a:	90 e0       	ldi	r25, 0x00	; 0
-}
      e5c:	df 91       	pop	r29
      e5e:	cf 91       	pop	r28
      e60:	ff 90       	pop	r15
@@ -2612,8 +1816,6 @@ int racketHit(Ball *ball, int racketPos){
      e68:	08 95       	ret
 
 00000e6a <updateBallAngle>:
-
-void updateBallAngle(Ball *ball, int racketPos){
      e6a:	cf 92       	push	r12
      e6c:	df 92       	push	r13
      e6e:	ef 92       	push	r14
@@ -2624,8 +1826,6 @@ void updateBallAngle(Ball *ball, int racketPos){
      e78:	df 93       	push	r29
      e7a:	ec 01       	movw	r28, r24
      e7c:	8b 01       	movw	r16, r22
-	float hitPos = (float)(ball->posY - racketPos - 8)/8; //from -1 to 1
-	int newBallAngle = ball->angle + hitPos * 45;
      e7e:	6e 81       	ldd	r22, Y+6	; 0x06
      e80:	7f 81       	ldd	r23, Y+7	; 0x07
      e82:	88 27       	eor	r24, r24
@@ -2635,12 +1835,6 @@ void updateBallAngle(Ball *ball, int racketPos){
      e8a:	0e 94 79 0e 	call	0x1cf2	; 0x1cf2 <__floatsisf>
      e8e:	6b 01       	movw	r12, r22
      e90:	7c 01       	movw	r14, r24
-		return 1;
-	return 0;
-}
-
-void updateBallAngle(Ball *ball, int racketPos){
-	float hitPos = (float)(ball->posY - racketPos - 8)/8; //from -1 to 1
      e92:	b8 01       	movw	r22, r16
      e94:	88 27       	eor	r24, r24
      e96:	77 fd       	sbrc	r23, 7
@@ -2664,7 +1858,6 @@ void updateBallAngle(Ball *ball, int racketPos){
      ec0:	40 e0       	ldi	r20, 0x00	; 0
      ec2:	5e e3       	ldi	r21, 0x3E	; 62
      ec4:	0e 94 2d 0f 	call	0x1e5a	; 0x1e5a <__mulsf3>
-	int newBallAngle = ball->angle + hitPos * 45;
      ec8:	20 e0       	ldi	r18, 0x00	; 0
      eca:	30 e0       	ldi	r19, 0x00	; 0
      ecc:	44 e3       	ldi	r20, 0x34	; 52
@@ -2676,7 +1869,6 @@ void updateBallAngle(Ball *ball, int racketPos){
      eda:	b6 01       	movw	r22, r12
      edc:	0e 94 76 0d 	call	0x1aec	; 0x1aec <__addsf3>
      ee0:	0e 94 46 0e 	call	0x1c8c	; 0x1c8c <__fixsfsi>
-	if(newBallAngle > 45) ball->angle = 45;
      ee4:	6e 32       	cpi	r22, 0x2E	; 46
      ee6:	71 05       	cpc	r23, r1
      ee8:	2c f0       	brlt	.+10     	; 0xef4 <updateBallAngle+0x8a>
@@ -2685,7 +1877,6 @@ void updateBallAngle(Ball *ball, int racketPos){
      eee:	9f 83       	std	Y+7, r25	; 0x07
      ef0:	8e 83       	std	Y+6, r24	; 0x06
      ef2:	0b c0       	rjmp	.+22     	; 0xf0a <updateBallAngle+0xa0>
-	else if(newBallAngle < -45) ball->angle = 45;
      ef4:	63 3d       	cpi	r22, 0xD3	; 211
      ef6:	4f ef       	ldi	r20, 0xFF	; 255
      ef8:	74 07       	cpc	r23, r20
@@ -2695,10 +1886,8 @@ void updateBallAngle(Ball *ball, int racketPos){
      f00:	9f 83       	std	Y+7, r25	; 0x07
      f02:	8e 83       	std	Y+6, r24	; 0x06
      f04:	02 c0       	rjmp	.+4      	; 0xf0a <updateBallAngle+0xa0>
-	else ball->angle = newBallAngle;
      f06:	7f 83       	std	Y+7, r23	; 0x07
      f08:	6e 83       	std	Y+6, r22	; 0x06
-}
      f0a:	df 91       	pop	r29
      f0c:	cf 91       	pop	r28
      f0e:	1f 91       	pop	r17
@@ -2710,12 +1899,9 @@ void updateBallAngle(Ball *ball, int racketPos){
      f1a:	08 95       	ret
 
 00000f1c <ballInit>:
-
-void ballInit(Ball *ball){
      f1c:	cf 93       	push	r28
      f1e:	df 93       	push	r29
      f20:	ec 01       	movw	r28, r24
-	ball->dir = rand() % 2;
      f22:	0e 94 6e 11 	call	0x22dc	; 0x22dc <rand>
      f26:	81 70       	andi	r24, 0x01	; 1
      f28:	90 78       	andi	r25, 0x80	; 128
@@ -2727,7 +1913,6 @@ void ballInit(Ball *ball){
      f34:	01 96       	adiw	r24, 0x01	; 1
      f36:	99 87       	std	Y+9, r25	; 0x09
      f38:	88 87       	std	Y+8, r24	; 0x08
-	ball->angle = (rand() % 91) - 45;
      f3a:	0e 94 6e 11 	call	0x22dc	; 0x22dc <rand>
      f3e:	6b e5       	ldi	r22, 0x5B	; 91
      f40:	70 e0       	ldi	r23, 0x00	; 0
@@ -2735,19 +1920,15 @@ void ballInit(Ball *ball){
      f46:	8d 97       	sbiw	r24, 0x2d	; 45
      f48:	9f 83       	std	Y+7, r25	; 0x07
      f4a:	8e 83       	std	Y+6, r24	; 0x06
-	ball->posX = 63;
      f4c:	8f e3       	ldi	r24, 0x3F	; 63
      f4e:	90 e0       	ldi	r25, 0x00	; 0
      f50:	99 83       	std	Y+1, r25	; 0x01
      f52:	88 83       	st	Y, r24
-}
      f54:	df 91       	pop	r29
      f56:	cf 91       	pop	r28
      f58:	08 95       	ret
 
 00000f5a <updateBallPosition>:
-
-void updateBallPosition(Ball *ball){
      f5a:	cf 92       	push	r12
      f5c:	df 92       	push	r13
      f5e:	ef 92       	push	r14
@@ -2757,7 +1938,6 @@ void updateBallPosition(Ball *ball){
      f66:	cf 93       	push	r28
      f68:	df 93       	push	r29
      f6a:	ec 01       	movw	r28, r24
-	float tempPosY = ball->posY + ((float)(ball->angle)/45);
      f6c:	0e 81       	ldd	r16, Y+6	; 0x06
      f6e:	1f 81       	ldd	r17, Y+7	; 0x07
      f70:	b8 01       	movw	r22, r16
@@ -2778,9 +1958,6 @@ void updateBallPosition(Ball *ball){
      f92:	0e 94 76 0d 	call	0x1aec	; 0x1aec <__addsf3>
      f96:	6b 01       	movw	r12, r22
      f98:	7c 01       	movw	r14, r24
-	
-	//hits the wall
-	if (tempPosY > 63){ 
      f9a:	20 e0       	ldi	r18, 0x00	; 0
      f9c:	30 e0       	ldi	r19, 0x00	; 0
      f9e:	4c e7       	ldi	r20, 0x7C	; 124
@@ -2788,7 +1965,6 @@ void updateBallPosition(Ball *ball){
      fa2:	0e 94 29 0f 	call	0x1e52	; 0x1e52 <__gesf2>
      fa6:	18 16       	cp	r1, r24
      fa8:	d4 f4       	brge	.+52     	; 0xfde <updateBallPosition+0x84>
-		ball->posY = 63 - (tempPosY - 63);
      faa:	20 e0       	ldi	r18, 0x00	; 0
      fac:	30 e0       	ldi	r19, 0x00	; 0
      fae:	4c e7       	ldi	r20, 0x7C	; 124
@@ -2807,15 +1983,12 @@ void updateBallPosition(Ball *ball){
      fcc:	7b 83       	std	Y+3, r23	; 0x03
      fce:	8c 83       	std	Y+4, r24	; 0x04
      fd0:	9d 83       	std	Y+5, r25	; 0x05
-		ball->angle *= -1;
      fd2:	11 95       	neg	r17
      fd4:	01 95       	neg	r16
      fd6:	11 09       	sbc	r17, r1
      fd8:	1f 83       	std	Y+7, r17	; 0x07
      fda:	0e 83       	std	Y+6, r16	; 0x06
      fdc:	1b c0       	rjmp	.+54     	; 0x1014 <updateBallPosition+0xba>
-	}
-	else if (tempPosY < 0){
      fde:	20 e0       	ldi	r18, 0x00	; 0
      fe0:	30 e0       	ldi	r19, 0x00	; 0
      fe2:	a9 01       	movw	r20, r18
@@ -2824,7 +1997,6 @@ void updateBallPosition(Ball *ball){
      fe8:	0e 94 da 0d 	call	0x1bb4	; 0x1bb4 <__cmpsf2>
      fec:	88 23       	and	r24, r24
      fee:	74 f4       	brge	.+28     	; 0x100c <updateBallPosition+0xb2>
-		ball->posY = -1*tempPosY;
      ff0:	f7 fa       	bst	r15, 7
      ff2:	f0 94       	com	r15
      ff4:	f7 f8       	bld	r15, 7
@@ -2833,38 +2005,31 @@ void updateBallPosition(Ball *ball){
      ffa:	db 82       	std	Y+3, r13	; 0x03
      ffc:	ec 82       	std	Y+4, r14	; 0x04
      ffe:	fd 82       	std	Y+5, r15	; 0x05
-		ball->angle *= -1;
     1000:	11 95       	neg	r17
     1002:	01 95       	neg	r16
     1004:	11 09       	sbc	r17, r1
     1006:	1f 83       	std	Y+7, r17	; 0x07
     1008:	0e 83       	std	Y+6, r16	; 0x06
     100a:	04 c0       	rjmp	.+8      	; 0x1014 <updateBallPosition+0xba>
-	}
-	else ball->posY = tempPosY;
     100c:	ca 82       	std	Y+2, r12	; 0x02
     100e:	db 82       	std	Y+3, r13	; 0x03
     1010:	ec 82       	std	Y+4, r14	; 0x04
     1012:	fd 82       	std	Y+5, r15	; 0x05
-	if(ball->dir == RIGHT)
     1014:	88 85       	ldd	r24, Y+8	; 0x08
     1016:	99 85       	ldd	r25, Y+9	; 0x09
     1018:	01 97       	sbiw	r24, 0x01	; 1
     101a:	31 f4       	brne	.+12     	; 0x1028 <updateBallPosition+0xce>
-		ball->posX++;
     101c:	88 81       	ld	r24, Y
     101e:	99 81       	ldd	r25, Y+1	; 0x01
     1020:	01 96       	adiw	r24, 0x01	; 1
     1022:	99 83       	std	Y+1, r25	; 0x01
     1024:	88 83       	st	Y, r24
     1026:	05 c0       	rjmp	.+10     	; 0x1032 <updateBallPosition+0xd8>
-	else ball->posX--;
     1028:	88 81       	ld	r24, Y
     102a:	99 81       	ldd	r25, Y+1	; 0x01
     102c:	01 97       	sbiw	r24, 0x01	; 1
     102e:	99 83       	std	Y+1, r25	; 0x01
     1030:	88 83       	st	Y, r24
-}
     1032:	df 91       	pop	r29
     1034:	cf 91       	pop	r28
     1036:	1f 91       	pop	r17
@@ -2876,18 +2041,15 @@ void updateBallPosition(Ball *ball){
     1042:	08 95       	ret
 
 00001044 <updateSliderPosition>:
-void updateSliderPosition(Slider *slide){
     1044:	cf 93       	push	r28
     1046:	df 93       	push	r29
     1048:	ec 01       	movw	r28, r24
-	*slide = getSliderPosition();
     104a:	0e 94 f7 02 	call	0x5ee	; 0x5ee <getSliderPosition>
     104e:	9b 01       	movw	r18, r22
     1050:	68 83       	st	Y, r22
     1052:	79 83       	std	Y+1, r23	; 0x01
     1054:	8a 83       	std	Y+2, r24	; 0x02
     1056:	9b 83       	std	Y+3, r25	; 0x03
-	slide->left = (slide->left)*(63-RACKETSIZE)/100;
     1058:	ef e2       	ldi	r30, 0x2F	; 47
     105a:	e2 9f       	mul	r30, r18
     105c:	c0 01       	movw	r24, r0
@@ -2900,7 +2062,6 @@ void updateSliderPosition(Slider *slide){
     106a:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
     106e:	79 83       	std	Y+1, r23	; 0x01
     1070:	68 83       	st	Y, r22
-	slide->right = (slide->right)*(63-RACKETSIZE)/100;
     1072:	4a 81       	ldd	r20, Y+2	; 0x02
     1074:	5b 81       	ldd	r21, Y+3	; 0x03
     1076:	e4 9f       	mul	r30, r20
@@ -2912,18 +2073,11 @@ void updateSliderPosition(Slider *slide){
     1082:	0e 94 90 0f 	call	0x1f20	; 0x1f20 <__divmodhi4>
     1086:	7b 83       	std	Y+3, r23	; 0x03
     1088:	6a 83       	std	Y+2, r22	; 0x02
-} 
     108a:	df 91       	pop	r29
     108c:	cf 91       	pop	r28
     108e:	08 95       	ret
 
 00001090 <updateScreen>:
-			printEndScreen("Player Left won!");
-		}
-	}
-}
-
-void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     1090:	cf 92       	push	r12
     1092:	df 92       	push	r13
     1094:	ef 92       	push	r14
@@ -2946,17 +2100,14 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     10b6:	3c 83       	std	Y+4, r19	; 0x04
     10b8:	4d 83       	std	Y+5, r20	; 0x05
     10ba:	5e 83       	std	Y+6, r21	; 0x06
-	oled_sram_clear_screen(0);
     10bc:	80 e0       	ldi	r24, 0x00	; 0
     10be:	90 e0       	ldi	r25, 0x00	; 0
     10c0:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	for (int i = 0; i < RACKETSIZE; i++){
     10c4:	00 e0       	ldi	r16, 0x00	; 0
     10c6:	10 e0       	ldi	r17, 0x00	; 0
     10c8:	a8 01       	movw	r20, r16
     10ca:	4e 0d       	add	r20, r14
     10cc:	5f 1d       	adc	r21, r15
-		oled_sram_write_bit(0, 1, leftRacketPos + i);
     10ce:	61 e0       	ldi	r22, 0x01	; 1
     10d0:	70 e0       	ldi	r23, 0x00	; 0
     10d2:	80 e0       	ldi	r24, 0x00	; 0
@@ -2965,18 +2116,11 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     10da:	a8 01       	movw	r20, r16
     10dc:	4c 0d       	add	r20, r12
     10de:	5d 1d       	adc	r21, r13
-		oled_sram_write_bit(0,127, rightRacketPos + i);
     10e0:	6f e7       	ldi	r22, 0x7F	; 127
     10e2:	70 e0       	ldi	r23, 0x00	; 0
     10e4:	80 e0       	ldi	r24, 0x00	; 0
     10e6:	90 e0       	ldi	r25, 0x00	; 0
     10e8:	0e 94 65 06 	call	0xcca	; 0xcca <oled_sram_write_bit>
-	}
-}
-
-void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
-	oled_sram_clear_screen(0);
-	for (int i = 0; i < RACKETSIZE; i++){
     10ec:	0f 5f       	subi	r16, 0xFF	; 255
     10ee:	1f 4f       	sbci	r17, 0xFF	; 255
     10f0:	00 31       	cpi	r16, 0x10	; 16
@@ -2984,12 +2128,6 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     10f4:	49 f7       	brne	.-46     	; 0x10c8 <updateScreen+0x38>
     10f6:	00 e0       	ldi	r16, 0x00	; 0
     10f8:	10 e0       	ldi	r17, 0x00	; 0
-		oled_sram_write_bit(0, 1, leftRacketPos + i);
-		oled_sram_write_bit(0,127, rightRacketPos + i);
-	}
-	for(int i = 0; i < 2; i++){
-		for(int j = 0; j < 2; j++){
-			oled_sram_write_bit(0, ball.posX + i, ball.posY + j);
     10fa:	20 e0       	ldi	r18, 0x00	; 0
     10fc:	30 e0       	ldi	r19, 0x00	; 0
     10fe:	a9 01       	movw	r20, r18
@@ -3027,26 +2165,14 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     1148:	80 e0       	ldi	r24, 0x00	; 0
     114a:	90 e0       	ldi	r25, 0x00	; 0
     114c:	0e 94 65 06 	call	0xcca	; 0xcca <oled_sram_write_bit>
-	oled_sram_clear_screen(0);
-	for (int i = 0; i < RACKETSIZE; i++){
-		oled_sram_write_bit(0, 1, leftRacketPos + i);
-		oled_sram_write_bit(0,127, rightRacketPos + i);
-	}
-	for(int i = 0; i < 2; i++){
     1150:	0f 5f       	subi	r16, 0xFF	; 255
     1152:	1f 4f       	sbci	r17, 0xFF	; 255
     1154:	02 30       	cpi	r16, 0x02	; 2
     1156:	11 05       	cpc	r17, r1
     1158:	81 f6       	brne	.-96     	; 0x10fa <updateScreen+0x6a>
-		for(int j = 0; j < 2; j++){
-			oled_sram_write_bit(0, ball.posX + i, ball.posY + j);
-		}
-	}
-	oled_sram_flush(0);
     115a:	80 e0       	ldi	r24, 0x00	; 0
     115c:	90 e0       	ldi	r25, 0x00	; 0
     115e:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
-}
     1162:	2a 96       	adiw	r28, 0x0a	; 10
     1164:	0f b6       	in	r0, 0x3f	; 63
     1166:	f8 94       	cli
@@ -3064,12 +2190,6 @@ void updateScreen(Ball ball, int leftRacketPos, int rightRacketPos){
     117e:	08 95       	ret
 
 00001180 <playRound>:
-	*slide = getSliderPosition();
-	slide->left = (slide->left)*(63-RACKETSIZE)/100;
-	slide->right = (slide->right)*(63-RACKETSIZE)/100;
-} 
-
-int playRound(){
     1180:	af 92       	push	r10
     1182:	bf 92       	push	r11
     1184:	cf 92       	push	r12
@@ -3088,37 +2208,20 @@ int playRound(){
     119e:	de bf       	out	0x3e, r29	; 62
     11a0:	0f be       	out	0x3f, r0	; 63
     11a2:	cd bf       	out	0x3d, r28	; 61
-	Ball ball;
-	Slider slide;
-	ballInit(&ball);
     11a4:	ce 01       	movw	r24, r28
     11a6:	01 96       	adiw	r24, 0x01	; 1
     11a8:	0e 94 8e 07 	call	0xf1c	; 0xf1c <ballInit>
-				return LEFT;
-			}
-		}
-		else if (ball.posX == 1){
-			if (racketHit(&ball, slide.left) ){
-				ball.dir = RIGHT;
     11ac:	aa 24       	eor	r10, r10
     11ae:	a3 94       	inc	r10
     11b0:	b1 2c       	mov	r11, r1
-	Ball ball;
-	Slider slide;
-	ballInit(&ball);
-	int time = 25;
-	while(1){
-		updateSliderPosition(&slide);
     11b2:	ce 01       	movw	r24, r28
     11b4:	0b 96       	adiw	r24, 0x0b	; 11
     11b6:	0e 94 22 08 	call	0x1044	; 0x1044 <updateSliderPosition>
-		if (ball.posX >= 126){
     11ba:	09 81       	ldd	r16, Y+1	; 0x01
     11bc:	1a 81       	ldd	r17, Y+2	; 0x02
     11be:	0e 37       	cpi	r16, 0x7E	; 126
     11c0:	11 05       	cpc	r17, r1
     11c2:	94 f0       	brlt	.+36     	; 0x11e8 <playRound+0x68>
-			if (racketHit(&ball, slide.right) ){
     11c4:	ed 84       	ldd	r14, Y+13	; 0x0d
     11c6:	fe 84       	ldd	r15, Y+14	; 0x0e
     11c8:	b7 01       	movw	r22, r14
@@ -3128,25 +2231,16 @@ int playRound(){
     11d2:	8c 01       	movw	r16, r24
     11d4:	00 97       	sbiw	r24, 0x00	; 0
     11d6:	a9 f1       	breq	.+106    	; 0x1242 <playRound+0xc2>
-				ball.dir = LEFT;
     11d8:	1a 86       	std	Y+10, r1	; 0x0a
     11da:	19 86       	std	Y+9, r1	; 0x09
-				updateBallAngle(&ball, slide.right);
     11dc:	b7 01       	movw	r22, r14
     11de:	ce 01       	movw	r24, r28
     11e0:	01 96       	adiw	r24, 0x01	; 1
     11e2:	0e 94 35 07 	call	0xe6a	; 0xe6a <updateBallAngle>
     11e6:	13 c0       	rjmp	.+38     	; 0x120e <playRound+0x8e>
-			}
-			else{
-				return LEFT;
-			}
-		}
-		else if (ball.posX == 1){
     11e8:	01 30       	cpi	r16, 0x01	; 1
     11ea:	11 05       	cpc	r17, r1
     11ec:	81 f4       	brne	.+32     	; 0x120e <playRound+0x8e>
-			if (racketHit(&ball, slide.left) ){
     11ee:	eb 84       	ldd	r14, Y+11	; 0x0b
     11f0:	fc 84       	ldd	r15, Y+12	; 0x0c
     11f2:	b7 01       	movw	r22, r14
@@ -3155,24 +2249,15 @@ int playRound(){
     11f8:	0e 94 fb 06 	call	0xdf6	; 0xdf6 <racketHit>
     11fc:	89 2b       	or	r24, r25
     11fe:	09 f1       	breq	.+66     	; 0x1242 <playRound+0xc2>
-				ball.dir = RIGHT;
     1200:	ba 86       	std	Y+10, r11	; 0x0a
     1202:	a9 86       	std	Y+9, r10	; 0x09
-				updateBallAngle(&ball, slide.left);
     1204:	b7 01       	movw	r22, r14
     1206:	ce 01       	movw	r24, r28
     1208:	01 96       	adiw	r24, 0x01	; 1
     120a:	0e 94 35 07 	call	0xe6a	; 0xe6a <updateBallAngle>
-			}
-			else {
-				return RIGHT;
-			}
-		}
-		updateBallPosition(&ball);
     120e:	ce 01       	movw	r24, r28
     1210:	01 96       	adiw	r24, 0x01	; 1
     1212:	0e 94 ad 07 	call	0xf5a	; 0xf5a <updateBallPosition>
-		updateScreen(ball, slide.left, slide.right);
     1216:	cd 84       	ldd	r12, Y+13	; 0x0d
     1218:	de 84       	ldd	r13, Y+14	; 0x0e
     121a:	eb 84       	ldd	r14, Y+11	; 0x0b
@@ -3194,9 +2279,6 @@ int playRound(){
     123c:	f1 f7       	brne	.-4      	; 0x123a <playRound+0xba>
     123e:	00 c0       	rjmp	.+0      	; 0x1240 <playRound+0xc0>
     1240:	b8 cf       	rjmp	.-144    	; 0x11b2 <playRound+0x32>
-		_delay_ms(2);
-	}
-}
     1242:	c8 01       	movw	r24, r16
     1244:	2e 96       	adiw	r28, 0x0e	; 14
     1246:	0f b6       	in	r0, 0x3f	; 63
@@ -3217,12 +2299,6 @@ int playRound(){
     1264:	08 95       	ret
 
 00001266 <printScore>:
-			oled_sram_write_bit(0, ball.posX + i, ball.posY + j);
-		}
-	}
-	oled_sram_flush(0);
-}
-void printScore(int leftPoints, int rightPoints){
     1266:	0f 93       	push	r16
     1268:	1f 93       	push	r17
     126a:	cf 93       	push	r28
@@ -3233,20 +2309,15 @@ void printScore(int leftPoints, int rightPoints){
     1274:	de b7       	in	r29, 0x3e	; 62
     1276:	08 2f       	mov	r16, r24
     1278:	16 2f       	mov	r17, r22
-	oled_sram_clear_screen(0);
     127a:	80 e0       	ldi	r24, 0x00	; 0
     127c:	90 e0       	ldi	r25, 0x00	; 0
     127e:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	char lp = leftPoints + '0';
     1282:	00 5d       	subi	r16, 0xD0	; 208
     1284:	09 83       	std	Y+1, r16	; 0x01
-	char mid = '-';
     1286:	8d e2       	ldi	r24, 0x2D	; 45
     1288:	8a 83       	std	Y+2, r24	; 0x02
-	char rp = rightPoints + '0';
     128a:	10 5d       	subi	r17, 0xD0	; 208
     128c:	1b 83       	std	Y+3, r17	; 0x03
-	oled_sram_write_char(0, &lp, 2, 56);
     128e:	28 e3       	ldi	r18, 0x38	; 56
     1290:	30 e0       	ldi	r19, 0x00	; 0
     1292:	42 e0       	ldi	r20, 0x02	; 2
@@ -3257,7 +2328,6 @@ void printScore(int leftPoints, int rightPoints){
     129c:	80 e0       	ldi	r24, 0x00	; 0
     129e:	90 e0       	ldi	r25, 0x00	; 0
     12a0:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-	oled_sram_write_char(0, &mid, 2, 64);
     12a4:	20 e4       	ldi	r18, 0x40	; 64
     12a6:	30 e0       	ldi	r19, 0x00	; 0
     12a8:	42 e0       	ldi	r20, 0x02	; 2
@@ -3268,7 +2338,6 @@ void printScore(int leftPoints, int rightPoints){
     12b2:	80 e0       	ldi	r24, 0x00	; 0
     12b4:	90 e0       	ldi	r25, 0x00	; 0
     12b6:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-	oled_sram_write_char(0, &rp, 2, 72);
     12ba:	28 e4       	ldi	r18, 0x48	; 72
     12bc:	30 e0       	ldi	r19, 0x00	; 0
     12be:	42 e0       	ldi	r20, 0x02	; 2
@@ -3279,11 +2348,9 @@ void printScore(int leftPoints, int rightPoints){
     12c8:	80 e0       	ldi	r24, 0x00	; 0
     12ca:	90 e0       	ldi	r25, 0x00	; 0
     12cc:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-	oled_sram_flush(0);	
     12d0:	80 e0       	ldi	r24, 0x00	; 0
     12d2:	90 e0       	ldi	r25, 0x00	; 0
     12d4:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
-}
     12d8:	0f 90       	pop	r0
     12da:	0f 90       	pop	r0
     12dc:	0f 90       	pop	r0
@@ -3294,23 +2361,18 @@ void printScore(int leftPoints, int rightPoints){
     12e6:	08 95       	ret
 
 000012e8 <printEndScreen>:
-void printEndScreen(char *endMessage){
     12e8:	0f 93       	push	r16
     12ea:	1f 93       	push	r17
     12ec:	cf 93       	push	r28
     12ee:	df 93       	push	r29
     12f0:	8c 01       	movw	r16, r24
-	oled_sram_clear_screen(0);
     12f2:	80 e0       	ldi	r24, 0x00	; 0
     12f4:	90 e0       	ldi	r25, 0x00	; 0
     12f6:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	for(int i = 0; i < 10; i++){
     12fa:	c0 e0       	ldi	r28, 0x00	; 0
     12fc:	d0 e0       	ldi	r29, 0x00	; 0
-		if( i % 2 ){
     12fe:	c0 ff       	sbrs	r28, 0
     1300:	11 c0       	rjmp	.+34     	; 0x1324 <printEndScreen+0x3c>
-			oled_sram_write_string(0, endMessage, 2);
     1302:	42 e0       	ldi	r20, 0x02	; 2
     1304:	50 e0       	ldi	r21, 0x00	; 0
     1306:	b8 01       	movw	r22, r16
@@ -3336,22 +2398,10 @@ void printEndScreen(char *endMessage){
     1330:	e1 f7       	brne	.-8      	; 0x132a <printEndScreen+0x42>
     1332:	00 c0       	rjmp	.+0      	; 0x1334 <printEndScreen+0x4c>
     1334:	00 00       	nop
-	oled_sram_write_char(0, &rp, 2, 72);
-	oled_sram_flush(0);	
-}
-void printEndScreen(char *endMessage){
-	oled_sram_clear_screen(0);
-	for(int i = 0; i < 10; i++){
     1336:	21 96       	adiw	r28, 0x01	; 1
     1338:	ca 30       	cpi	r28, 0x0A	; 10
     133a:	d1 05       	cpc	r29, r1
     133c:	01 f7       	brne	.-64     	; 0x12fe <printEndScreen+0x16>
-			oled_sram_write_string(0, endMessage, 2);
-			_delay_ms(300);
-		}
-		else _delay_ms(300);
-	}
-	oled_sram_flush(0);	
     133e:	80 e0       	ldi	r24, 0x00	; 0
     1340:	90 e0       	ldi	r25, 0x00	; 0
     1342:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
@@ -3362,36 +2412,13 @@ void printEndScreen(char *endMessage){
     134e:	08 95       	ret
 
 00001350 <playPong>:
-
-void playPong(){
-	int pointLeft = 0;
-	int pointRight = 0;
-	int point;
-	oled_sram_clear_screen(0);
     1350:	80 e0       	ldi	r24, 0x00	; 0
     1352:	90 e0       	ldi	r25, 0x00	; 0
     1354:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	}
-}
-
-void playPong(){
-	int pointLeft = 0;
-	int pointRight = 0;
     1358:	00 e0       	ldi	r16, 0x00	; 0
     135a:	10 e0       	ldi	r17, 0x00	; 0
-		_delay_ms(2);
-	}
-}
-
-void playPong(){
-	int pointLeft = 0;
     135c:	c0 e0       	ldi	r28, 0x00	; 0
     135e:	d0 e0       	ldi	r29, 0x00	; 0
-	int pointRight = 0;
-	int point;
-	oled_sram_clear_screen(0);
-	while(1){
-		printScore(pointLeft, pointRight);
     1360:	b8 01       	movw	r22, r16
     1362:	ce 01       	movw	r24, r28
     1364:	0e 94 33 09 	call	0x1266	; 0x1266 <printScore>
@@ -3404,49 +2431,32 @@ void playPong(){
     1374:	e1 f7       	brne	.-8      	; 0x136e <playPong+0x1e>
     1376:	00 c0       	rjmp	.+0      	; 0x1378 <playPong+0x28>
     1378:	00 00       	nop
-		_delay_ms(2000);
-		point = playRound();
     137a:	0e 94 c0 08 	call	0x1180	; 0x1180 <playRound>
-		if (point == LEFT) pointLeft++;
     137e:	89 2b       	or	r24, r25
     1380:	11 f4       	brne	.+4      	; 0x1386 <playPong+0x36>
     1382:	21 96       	adiw	r28, 0x01	; 1
     1384:	02 c0       	rjmp	.+4      	; 0x138a <playPong+0x3a>
-		else pointRight++;
     1386:	0f 5f       	subi	r16, 0xFF	; 255
     1388:	1f 4f       	sbci	r17, 0xFF	; 255
-		if(pointLeft == 5){
     138a:	c5 30       	cpi	r28, 0x05	; 5
     138c:	d1 05       	cpc	r29, r1
     138e:	29 f4       	brne	.+10     	; 0x139a <playPong+0x4a>
-			printEndScreen("Player Right won!");
     1390:	83 e7       	ldi	r24, 0x73	; 115
     1392:	91 e0       	ldi	r25, 0x01	; 1
     1394:	0e 94 74 09 	call	0x12e8	; 0x12e8 <printEndScreen>
     1398:	e3 cf       	rjmp	.-58     	; 0x1360 <playPong+0x10>
-		}
-		else if(pointRight == 5){
     139a:	05 30       	cpi	r16, 0x05	; 5
     139c:	11 05       	cpc	r17, r1
     139e:	01 f7       	brne	.-64     	; 0x1360 <playPong+0x10>
-			printEndScreen("Player Left won!");
     13a0:	85 e8       	ldi	r24, 0x85	; 133
     13a2:	91 e0       	ldi	r25, 0x01	; 1
     13a4:	0e 94 74 09 	call	0x12e8	; 0x12e8 <printEndScreen>
     13a8:	db cf       	rjmp	.-74     	; 0x1360 <playPong+0x10>
 
 000013aa <detectCollision>:
-#include <util/delay.h>
-#include "../Driver_files/oled_driver.h"
-#include <stdlib.h>
-
-
-int detectCollision(segment *s, int x, int y){
     13aa:	fc 01       	movw	r30, r24
-	while(s){
     13ac:	00 97       	sbiw	r24, 0x00	; 0
     13ae:	81 f0       	breq	.+32     	; 0x13d0 <detectCollision+0x26>
-		if (s->x == x && s->y == y){
     13b0:	84 81       	ldd	r24, Z+4	; 0x04
     13b2:	95 81       	ldd	r25, Z+5	; 0x05
     13b4:	86 17       	cp	r24, r22
@@ -3457,59 +2467,29 @@ int detectCollision(segment *s, int x, int y){
     13be:	84 17       	cp	r24, r20
     13c0:	95 07       	cpc	r25, r21
     13c2:	49 f0       	breq	.+18     	; 0x13d6 <detectCollision+0x2c>
-			return 1;
-		}
-		s = s->next;
     13c4:	01 90       	ld	r0, Z+
     13c6:	f0 81       	ld	r31, Z
     13c8:	e0 2d       	mov	r30, r0
-#include "../Driver_files/oled_driver.h"
-#include <stdlib.h>
-
-
-int detectCollision(segment *s, int x, int y){
-	while(s){
     13ca:	30 97       	sbiw	r30, 0x00	; 0
     13cc:	89 f7       	brne	.-30     	; 0x13b0 <detectCollision+0x6>
     13ce:	06 c0       	rjmp	.+12     	; 0x13dc <detectCollision+0x32>
-		if (s->x == x && s->y == y){
-			return 1;
-		}
-		s = s->next;
-	}
-	return 0;
     13d0:	80 e0       	ldi	r24, 0x00	; 0
     13d2:	90 e0       	ldi	r25, 0x00	; 0
     13d4:	08 95       	ret
-
-
-int detectCollision(segment *s, int x, int y){
-	while(s){
-		if (s->x == x && s->y == y){
-			return 1;
     13d6:	81 e0       	ldi	r24, 0x01	; 1
     13d8:	90 e0       	ldi	r25, 0x00	; 0
     13da:	08 95       	ret
-		}
-		s = s->next;
-	}
-	return 0;
     13dc:	80 e0       	ldi	r24, 0x00	; 0
     13de:	90 e0       	ldi	r25, 0x00	; 0
-}
     13e0:	08 95       	ret
 
 000013e2 <placeFood>:
-
-void placeFood(int food[], segment *first){
     13e2:	0f 93       	push	r16
     13e4:	1f 93       	push	r17
     13e6:	cf 93       	push	r28
     13e8:	df 93       	push	r29
     13ea:	ec 01       	movw	r28, r24
     13ec:	8b 01       	movw	r16, r22
-	do{
-		food[0] = rand() % 64;
     13ee:	0e 94 6e 11 	call	0x22dc	; 0x22dc <rand>
     13f2:	8f 73       	andi	r24, 0x3F	; 63
     13f4:	90 78       	andi	r25, 0x80	; 128
@@ -3521,7 +2501,6 @@ void placeFood(int food[], segment *first){
     1400:	01 96       	adiw	r24, 0x01	; 1
     1402:	99 83       	std	Y+1, r25	; 0x01
     1404:	88 83       	st	Y, r24
-		food[1] = rand() % 32;
     1406:	0e 94 6e 11 	call	0x22dc	; 0x22dc <rand>
     140a:	ac 01       	movw	r20, r24
     140c:	4f 71       	andi	r20, 0x1F	; 31
@@ -3536,14 +2515,12 @@ void placeFood(int food[], segment *first){
     141e:	5f 4f       	sbci	r21, 0xFF	; 255
     1420:	5b 83       	std	Y+3, r21	; 0x03
     1422:	4a 83       	std	Y+2, r20	; 0x02
-	} while(detectCollision(first, food[0], food[1]));
     1424:	68 81       	ld	r22, Y
     1426:	79 81       	ldd	r23, Y+1	; 0x01
     1428:	c8 01       	movw	r24, r16
     142a:	0e 94 d5 09 	call	0x13aa	; 0x13aa <detectCollision>
     142e:	89 2b       	or	r24, r25
     1430:	f1 f6       	brne	.-68     	; 0x13ee <placeFood+0xc>
-}
     1432:	df 91       	pop	r29
     1434:	cf 91       	pop	r28
     1436:	1f 91       	pop	r17
@@ -3551,8 +2528,6 @@ void placeFood(int food[], segment *first){
     143a:	08 95       	ret
 
 0000143c <drawBoard>:
-
-void drawBoard(segment *s, int food[]){
     143c:	cf 92       	push	r12
     143e:	df 92       	push	r13
     1440:	ef 92       	push	r14
@@ -3563,29 +2538,16 @@ void drawBoard(segment *s, int food[]){
     144a:	df 93       	push	r29
     144c:	8c 01       	movw	r16, r24
     144e:	7b 01       	movw	r14, r22
-	oled_sram_clear_screen(0);
     1450:	80 e0       	ldi	r24, 0x00	; 0
     1452:	90 e0       	ldi	r25, 0x00	; 0
     1454:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	while(s){
     1458:	01 15       	cp	r16, r1
     145a:	11 05       	cpc	r17, r1
     145c:	09 f4       	brne	.+2      	; 0x1460 <drawBoard+0x24>
     145e:	59 c0       	rjmp	.+178    	; 0x1512 <drawBoard+0xd6>
-		food[0] = rand() % 64;
-		food[1] = rand() % 32;
-	} while(detectCollision(first, food[0], food[1]));
-}
-
-void drawBoard(segment *s, int food[]){
     1460:	c1 2c       	mov	r12, r1
     1462:	d1 2c       	mov	r13, r1
     1464:	2a c0       	rjmp	.+84     	; 0x14ba <drawBoard+0x7e>
-	oled_sram_clear_screen(0);
-	while(s){
-		for(int i = 0; i < 2; i++){
-			for (int j = 0; j < 2; j++){
-				oled_sram_write_bit(0, s->x*2 + i, s->y*2 + j);
     1466:	f8 01       	movw	r30, r16
     1468:	46 81       	ldd	r20, Z+6	; 0x06
     146a:	57 81       	ldd	r21, Z+7	; 0x07
@@ -3616,48 +2578,19 @@ void drawBoard(segment *s, int food[]){
     149e:	8c 2d       	mov	r24, r12
     14a0:	9d 2d       	mov	r25, r13
     14a2:	0e 94 65 06 	call	0xcca	; 0xcca <oled_sram_write_bit>
-}
-
-void drawBoard(segment *s, int food[]){
-	oled_sram_clear_screen(0);
-	while(s){
-		for(int i = 0; i < 2; i++){
     14a6:	21 96       	adiw	r28, 0x01	; 1
     14a8:	c2 30       	cpi	r28, 0x02	; 2
     14aa:	d1 05       	cpc	r29, r1
     14ac:	e1 f6       	brne	.-72     	; 0x1466 <drawBoard+0x2a>
-			for (int j = 0; j < 2; j++){
-				oled_sram_write_bit(0, s->x*2 + i, s->y*2 + j);
-			}
-		}
-		s = s->next;
     14ae:	f8 01       	movw	r30, r16
     14b0:	00 81       	ld	r16, Z
     14b2:	11 81       	ldd	r17, Z+1	; 0x01
-	} while(detectCollision(first, food[0], food[1]));
-}
-
-void drawBoard(segment *s, int food[]){
-	oled_sram_clear_screen(0);
-	while(s){
     14b4:	01 15       	cp	r16, r1
     14b6:	11 05       	cpc	r17, r1
     14b8:	61 f1       	breq	.+88     	; 0x1512 <drawBoard+0xd6>
-		food[0] = rand() % 64;
-		food[1] = rand() % 32;
-	} while(detectCollision(first, food[0], food[1]));
-}
-
-void drawBoard(segment *s, int food[]){
     14ba:	cc 2d       	mov	r28, r12
     14bc:	dd 2d       	mov	r29, r13
     14be:	d3 cf       	rjmp	.-90     	; 0x1466 <drawBoard+0x2a>
-		}
-		s = s->next;
-	}
-	for(int i = 0; i < 2; i++){
-		for (int j = 0; j < 2; j++){
-			oled_sram_write_bit(0, food[0]*2 +i, food[1]*2 + j);
     14c0:	f7 01       	movw	r30, r14
     14c2:	42 81       	ldd	r20, Z+2	; 0x02
     14c4:	53 81       	ldd	r21, Z+3	; 0x03
@@ -3688,40 +2621,17 @@ void drawBoard(segment *s, int food[]){
     14f8:	80 e0       	ldi	r24, 0x00	; 0
     14fa:	90 e0       	ldi	r25, 0x00	; 0
     14fc:	0e 94 65 06 	call	0xcca	; 0xcca <oled_sram_write_bit>
-				oled_sram_write_bit(0, s->x*2 + i, s->y*2 + j);
-			}
-		}
-		s = s->next;
-	}
-	for(int i = 0; i < 2; i++){
     1500:	21 96       	adiw	r28, 0x01	; 1
     1502:	c2 30       	cpi	r28, 0x02	; 2
     1504:	d1 05       	cpc	r29, r1
     1506:	e1 f6       	brne	.-72     	; 0x14c0 <drawBoard+0x84>
-		for (int j = 0; j < 2; j++){
-			oled_sram_write_bit(0, food[0]*2 +i, food[1]*2 + j);
-		}
-	}
-	oled_sram_flush(0);
     1508:	80 e0       	ldi	r24, 0x00	; 0
     150a:	90 e0       	ldi	r25, 0x00	; 0
     150c:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
     1510:	03 c0       	rjmp	.+6      	; 0x1518 <drawBoard+0xdc>
-		food[0] = rand() % 64;
-		food[1] = rand() % 32;
-	} while(detectCollision(first, food[0], food[1]));
-}
-
-void drawBoard(segment *s, int food[]){
     1512:	c0 e0       	ldi	r28, 0x00	; 0
     1514:	d0 e0       	ldi	r29, 0x00	; 0
     1516:	d4 cf       	rjmp	.-88     	; 0x14c0 <drawBoard+0x84>
-		for (int j = 0; j < 2; j++){
-			oled_sram_write_bit(0, food[0]*2 +i, food[1]*2 + j);
-		}
-	}
-	oled_sram_flush(0);
-}
     1518:	df 91       	pop	r29
     151a:	cf 91       	pop	r28
     151c:	1f 91       	pop	r17
@@ -3733,8 +2643,6 @@ void drawBoard(segment *s, int food[]){
     1528:	08 95       	ret
 
 0000152a <playSnake>:
-
-void playSnake(){
     152a:	af 92       	push	r10
     152c:	bf 92       	push	r11
     152e:	cf 92       	push	r12
@@ -3749,53 +2657,32 @@ void playSnake(){
     1540:	00 d0       	rcall	.+0      	; 0x1542 <playSnake+0x18>
     1542:	cd b7       	in	r28, 0x3d	; 61
     1544:	de b7       	in	r29, 0x3e	; 62
-	//create linked list of snake segments
-	segment *first = (segment*)malloc(sizeof(segment));
     1546:	88 e0       	ldi	r24, 0x08	; 8
     1548:	90 e0       	ldi	r25, 0x00	; 0
     154a:	0e 94 f9 0f 	call	0x1ff2	; 0x1ff2 <malloc>
     154e:	6c 01       	movw	r12, r24
-	first->x = 32;
     1550:	80 e2       	ldi	r24, 0x20	; 32
     1552:	90 e0       	ldi	r25, 0x00	; 0
     1554:	f6 01       	movw	r30, r12
     1556:	95 83       	std	Z+5, r25	; 0x05
     1558:	84 83       	std	Z+4, r24	; 0x04
-	first->y = 16;
     155a:	80 e1       	ldi	r24, 0x10	; 16
     155c:	90 e0       	ldi	r25, 0x00	; 0
     155e:	97 83       	std	Z+7, r25	; 0x07
     1560:	86 83       	std	Z+6, r24	; 0x06
-	segment *last = first;
-	first->next = 0;
     1562:	11 82       	std	Z+1, r1	; 0x01
     1564:	10 82       	st	Z, r1
-	first->prev = 0;
     1566:	13 82       	std	Z+3, r1	; 0x03
     1568:	12 82       	std	Z+2, r1	; 0x02
-	oled_sram_flush(0);
-}
-
-void playSnake(){
-	//create linked list of snake segments
-	segment *first = (segment*)malloc(sizeof(segment));
     156a:	86 01       	movw	r16, r12
-	first->x = 32;
-	first->y = 16;
-	segment *last = first;
-	first->next = 0;
-	first->prev = 0;
     156c:	68 94       	set
     156e:	aa 24       	eor	r10, r10
     1570:	a2 f8       	bld	r10, 2
     1572:	b1 2c       	mov	r11, r1
-	for(int i = 0; i < 4; i++){
-		segment *temp = (segment*)malloc(sizeof(segment));
     1574:	88 e0       	ldi	r24, 0x08	; 8
     1576:	90 e0       	ldi	r25, 0x00	; 0
     1578:	0e 94 f9 0f 	call	0x1ff2	; 0x1ff2 <malloc>
     157c:	7c 01       	movw	r14, r24
-		temp->x = first->x + 1;
     157e:	f8 01       	movw	r30, r16
     1580:	84 81       	ldd	r24, Z+4	; 0x04
     1582:	95 81       	ldd	r25, Z+5	; 0x05
@@ -3803,110 +2690,66 @@ void playSnake(){
     1586:	f7 01       	movw	r30, r14
     1588:	95 83       	std	Z+5, r25	; 0x05
     158a:	84 83       	std	Z+4, r24	; 0x04
-		temp->y = first->y;
     158c:	f8 01       	movw	r30, r16
     158e:	86 81       	ldd	r24, Z+6	; 0x06
     1590:	97 81       	ldd	r25, Z+7	; 0x07
     1592:	f7 01       	movw	r30, r14
     1594:	97 83       	std	Z+7, r25	; 0x07
     1596:	86 83       	std	Z+6, r24	; 0x06
-		temp->next = first;
     1598:	11 83       	std	Z+1, r17	; 0x01
     159a:	00 83       	st	Z, r16
-		temp->prev = 0;
     159c:	13 82       	std	Z+3, r1	; 0x03
     159e:	12 82       	std	Z+2, r1	; 0x02
-		first->prev = temp;
     15a0:	f8 01       	movw	r30, r16
     15a2:	f3 82       	std	Z+3, r15	; 0x03
     15a4:	e2 82       	std	Z+2, r14	; 0x02
     15a6:	f1 e0       	ldi	r31, 0x01	; 1
     15a8:	af 1a       	sub	r10, r31
     15aa:	b1 08       	sbc	r11, r1
-	first->x = 32;
-	first->y = 16;
-	segment *last = first;
-	first->next = 0;
-	first->prev = 0;
-	for(int i = 0; i < 4; i++){
     15ac:	a1 14       	cp	r10, r1
     15ae:	b1 04       	cpc	r11, r1
     15b0:	11 f0       	breq	.+4      	; 0x15b6 <playSnake+0x8c>
-		segment *temp = (segment*)malloc(sizeof(segment));
     15b2:	87 01       	movw	r16, r14
     15b4:	df cf       	rjmp	.-66     	; 0x1574 <playSnake+0x4a>
-	}
-
-
-	//initalize food
-	int food[2];
-	placeFood(food, first);
     15b6:	b7 01       	movw	r22, r14
     15b8:	ce 01       	movw	r24, r28
     15ba:	01 96       	adiw	r24, 0x01	; 1
     15bc:	0e 94 f1 09 	call	0x13e2	; 0x13e2 <placeFood>
-
-	//initialize direction of snake
-	direction S = RIGHT;
-	oled_sram_clear_screen(0);
     15c0:	80 e0       	ldi	r24, 0x00	; 0
     15c2:	90 e0       	ldi	r25, 0x00	; 0
     15c4:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	//initalize food
-	int food[2];
-	placeFood(food, first);
-
-	//initialize direction of snake
-	direction S = RIGHT;
     15c8:	aa 24       	eor	r10, r10
     15ca:	a3 94       	inc	r10
-	oled_sram_clear_screen(0);
-	//gamplay while loop
-	while (!detectCollision(first->next, first->x, first->y)){
     15cc:	70 c0       	rjmp	.+224    	; 0x16ae <playSnake+0x184>
-		Joystick j = getJoystickPosition();
     15ce:	0e 94 77 03 	call	0x6ee	; 0x6ee <getJoystickPosition>
     15d2:	b8 2e       	mov	r11, r24
-		direction D = j.D;
-		S = (D == NEUTRAL) ? S : D;
     15d4:	24 e0       	ldi	r18, 0x04	; 4
     15d6:	82 13       	cpse	r24, r18
     15d8:	01 c0       	rjmp	.+2      	; 0x15dc <playSnake+0xb2>
     15da:	ba 2c       	mov	r11, r10
-		//Create and set up next snake segment
-		segment *temp = (segment*)malloc(sizeof(segment));
     15dc:	88 e0       	ldi	r24, 0x08	; 8
     15de:	90 e0       	ldi	r25, 0x00	; 0
     15e0:	0e 94 f9 0f 	call	0x1ff2	; 0x1ff2 <malloc>
     15e4:	8c 01       	movw	r16, r24
-		
-		temp->x = first->x;
     15e6:	f7 01       	movw	r30, r14
     15e8:	24 81       	ldd	r18, Z+4	; 0x04
     15ea:	35 81       	ldd	r19, Z+5	; 0x05
     15ec:	fc 01       	movw	r30, r24
     15ee:	35 83       	std	Z+5, r19	; 0x05
     15f0:	24 83       	std	Z+4, r18	; 0x04
-		temp->y = first->y;
     15f2:	f7 01       	movw	r30, r14
     15f4:	26 81       	ldd	r18, Z+6	; 0x06
     15f6:	37 81       	ldd	r19, Z+7	; 0x07
     15f8:	fc 01       	movw	r30, r24
     15fa:	37 83       	std	Z+7, r19	; 0x07
     15fc:	26 83       	std	Z+6, r18	; 0x06
-		temp->next = first;
     15fe:	f1 82       	std	Z+1, r15	; 0x01
     1600:	e0 82       	st	Z, r14
-		temp->prev = 0;
     1602:	13 82       	std	Z+3, r1	; 0x03
     1604:	12 82       	std	Z+2, r1	; 0x02
-		first->prev = temp;
     1606:	f7 01       	movw	r30, r14
     1608:	93 83       	std	Z+3, r25	; 0x03
     160a:	82 83       	std	Z+2, r24	; 0x02
-
-		//Find direction of snake movement
-		switch (S){
     160c:	f1 e0       	ldi	r31, 0x01	; 1
     160e:	bf 16       	cp	r11, r31
     1610:	f1 f0       	breq	.+60     	; 0x164e <playSnake+0x124>
@@ -3919,50 +2762,33 @@ void playSnake(){
     161e:	b8 16       	cp	r11, r24
     1620:	41 f0       	breq	.+16     	; 0x1632 <playSnake+0x108>
     1622:	1b c0       	rjmp	.+54     	; 0x165a <playSnake+0x130>
-			case UP:
-			temp->y--;
     1624:	fc 01       	movw	r30, r24
     1626:	86 81       	ldd	r24, Z+6	; 0x06
     1628:	97 81       	ldd	r25, Z+7	; 0x07
     162a:	01 97       	sbiw	r24, 0x01	; 1
     162c:	97 83       	std	Z+7, r25	; 0x07
     162e:	86 83       	std	Z+6, r24	; 0x06
-			break;
     1630:	14 c0       	rjmp	.+40     	; 0x165a <playSnake+0x130>
-			case DOWN:
-			temp->y++;
     1632:	f8 01       	movw	r30, r16
     1634:	86 81       	ldd	r24, Z+6	; 0x06
     1636:	97 81       	ldd	r25, Z+7	; 0x07
     1638:	01 96       	adiw	r24, 0x01	; 1
     163a:	97 83       	std	Z+7, r25	; 0x07
     163c:	86 83       	std	Z+6, r24	; 0x06
-			break;
     163e:	0d c0       	rjmp	.+26     	; 0x165a <playSnake+0x130>
-			case LEFT:
-			temp->x--;
     1640:	fc 01       	movw	r30, r24
     1642:	84 81       	ldd	r24, Z+4	; 0x04
     1644:	95 81       	ldd	r25, Z+5	; 0x05
     1646:	01 97       	sbiw	r24, 0x01	; 1
     1648:	95 83       	std	Z+5, r25	; 0x05
     164a:	84 83       	std	Z+4, r24	; 0x04
-			break;
     164c:	06 c0       	rjmp	.+12     	; 0x165a <playSnake+0x130>
-			case RIGHT:
-			temp->x++;
     164e:	fc 01       	movw	r30, r24
     1650:	84 81       	ldd	r24, Z+4	; 0x04
     1652:	95 81       	ldd	r25, Z+5	; 0x05
     1654:	01 96       	adiw	r24, 0x01	; 1
     1656:	95 83       	std	Z+5, r25	; 0x05
     1658:	84 83       	std	Z+4, r24	; 0x04
-			break;
-		}
-
-		first = temp;
-		
-		if(detectCollision(first, food[0], food[1])){//hit food?
     165a:	4b 81       	ldd	r20, Y+3	; 0x03
     165c:	5c 81       	ldd	r21, Y+4	; 0x04
     165e:	69 81       	ldd	r22, Y+1	; 0x01
@@ -3971,38 +2797,20 @@ void playSnake(){
     1664:	0e 94 d5 09 	call	0x13aa	; 0x13aa <detectCollision>
     1668:	89 2b       	or	r24, r25
     166a:	31 f0       	breq	.+12     	; 0x1678 <playSnake+0x14e>
-			placeFood(food, first);
     166c:	b8 01       	movw	r22, r16
     166e:	ce 01       	movw	r24, r28
     1670:	01 96       	adiw	r24, 0x01	; 1
     1672:	0e 94 f1 09 	call	0x13e2	; 0x13e2 <placeFood>
     1676:	0a c0       	rjmp	.+20     	; 0x168c <playSnake+0x162>
-			temp = 0;
-		}
-		else{
-			temp = last;
-			last = last->prev;
     1678:	f6 01       	movw	r30, r12
     167a:	e2 80       	ldd	r14, Z+2	; 0x02
     167c:	f3 80       	ldd	r15, Z+3	; 0x03
-			last->next = 0;
     167e:	f7 01       	movw	r30, r14
     1680:	11 82       	std	Z+1, r1	; 0x01
     1682:	10 82       	st	Z, r1
-			free(temp);
     1684:	c6 01       	movw	r24, r12
     1686:	0e 94 91 10 	call	0x2122	; 0x2122 <free>
-			placeFood(food, first);
-			temp = 0;
-		}
-		else{
-			temp = last;
-			last = last->prev;
     168a:	67 01       	movw	r12, r14
-			last->next = 0;
-			free(temp);
-		}
-		drawBoard(first, food);
     168c:	be 01       	movw	r22, r28
     168e:	6f 5f       	subi	r22, 0xFF	; 255
     1690:	7f 4f       	sbci	r23, 0xFF	; 255
@@ -4017,26 +2825,8 @@ void playSnake(){
     16a4:	e1 f7       	brne	.-8      	; 0x169e <playSnake+0x174>
     16a6:	00 c0       	rjmp	.+0      	; 0x16a8 <playSnake+0x17e>
     16a8:	00 c0       	rjmp	.+0      	; 0x16aa <playSnake+0x180>
-	oled_sram_clear_screen(0);
-	//gamplay while loop
-	while (!detectCollision(first->next, first->x, first->y)){
-		Joystick j = getJoystickPosition();
-		direction D = j.D;
-		S = (D == NEUTRAL) ? S : D;
     16aa:	ab 2c       	mov	r10, r11
-			break;
-			default:
-			break;
-		}
-
-		first = temp;
     16ac:	78 01       	movw	r14, r16
-
-	//initialize direction of snake
-	direction S = RIGHT;
-	oled_sram_clear_screen(0);
-	//gamplay while loop
-	while (!detectCollision(first->next, first->x, first->y)){
     16ae:	f7 01       	movw	r30, r14
     16b0:	46 81       	ldd	r20, Z+6	; 0x06
     16b2:	57 81       	ldd	r21, Z+7	; 0x07
@@ -4048,11 +2838,6 @@ void playSnake(){
     16c0:	89 2b       	or	r24, r25
     16c2:	09 f4       	brne	.+2      	; 0x16c6 <playSnake+0x19c>
     16c4:	84 cf       	rjmp	.-248    	; 0x15ce <playSnake+0xa4>
-		}
-		drawBoard(first, food);
-		_delay_ms(100);
-	}
-
     16c6:	0f 90       	pop	r0
     16c8:	0f 90       	pop	r0
     16ca:	0f 90       	pop	r0
@@ -4070,12 +2855,6 @@ void playSnake(){
     16e2:	08 95       	ret
 
 000016e4 <make_screen>:
-	}
-	
-	
-}
-
-make_screen(menu* m){
     16e4:	2f 92       	push	r2
     16e6:	3f 92       	push	r3
     16e8:	4f 92       	push	r4
@@ -4099,13 +2878,9 @@ make_screen(menu* m){
     170c:	cd b7       	in	r28, 0x3d	; 61
     170e:	de b7       	in	r29, 0x3e	; 62
     1710:	7c 01       	movw	r14, r24
-	int startAddress = 0;
-	
-	oled_sram_clear_screen(startAddress);
     1712:	80 e0       	ldi	r24, 0x00	; 0
     1714:	90 e0       	ldi	r25, 0x00	; 0
     1716:	0e 94 51 06 	call	0xca2	; 0xca2 <oled_sram_clear_screen>
-	oled_sram_write_string(startAddress, m->name, 0); //Print menu name
     171a:	d7 01       	movw	r26, r14
     171c:	6d 91       	ld	r22, X+
     171e:	7c 91       	ld	r23, X
@@ -4114,7 +2889,6 @@ make_screen(menu* m){
     1724:	80 e0       	ldi	r24, 0x00	; 0
     1726:	90 e0       	ldi	r25, 0x00	; 0
     1728:	0e 94 b1 05 	call	0xb62	; 0xb62 <oled_sram_write_string>
-	for (int i = 0; i < m->num_submenues; i++){
     172c:	f7 01       	movw	r30, r14
     172e:	84 89       	ldd	r24, Z+20	; 0x14
     1730:	95 89       	ldd	r25, Z+21	; 0x15
@@ -4129,37 +2903,21 @@ make_screen(menu* m){
     1742:	cc 24       	eor	r12, r12
     1744:	c3 94       	inc	r12
     1746:	d1 2c       	mov	r13, r1
-		else{
-			oled_sram_write_char(startAddress, " ", i+1, 0);
-		}
-		while(c != '\0'){
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
     1748:	68 94       	set
     174a:	22 24       	eor	r2, r2
     174c:	23 f8       	bld	r2, 3
     174e:	31 2c       	mov	r3, r1
-	int startAddress = 0;
-	
-	oled_sram_clear_screen(startAddress);
-	oled_sram_write_string(startAddress, m->name, 0); //Print menu name
-	for (int i = 0; i < m->num_submenues; i++){
-		menu *sm = m->submenues[i];
     1750:	aa 81       	ldd	r26, Y+2	; 0x02
     1752:	bb 81       	ldd	r27, Y+3	; 0x03
     1754:	6d 90       	ld	r6, X+
     1756:	7d 90       	ld	r7, X+
     1758:	bb 83       	std	Y+3, r27	; 0x03
     175a:	aa 83       	std	Y+2, r26	; 0x02
-		
-		int index = 1;
-		char c = sm->name[0];
     175c:	d3 01       	movw	r26, r6
     175e:	ed 91       	ld	r30, X+
     1760:	fc 91       	ld	r31, X
     1762:	80 81       	ld	r24, Z
     1764:	89 83       	std	Y+1, r24	; 0x01
-		if(m->arrow == i){
     1766:	f7 01       	movw	r30, r14
     1768:	40 ad       	ldd	r20, Z+56	; 0x38
     176a:	51 ad       	ldd	r21, Z+57	; 0x39
@@ -4168,7 +2926,6 @@ make_screen(menu* m){
     1770:	48 17       	cp	r20, r24
     1772:	59 07       	cpc	r21, r25
     1774:	59 f4       	brne	.+22     	; 0x178c <make_screen+0xa8>
-			oled_sram_write_char(startAddress, ">", i+1, 0);
     1776:	4f 5f       	subi	r20, 0xFF	; 255
     1778:	5f 4f       	sbci	r21, 0xFF	; 255
     177a:	20 e0       	ldi	r18, 0x00	; 0
@@ -4179,9 +2936,6 @@ make_screen(menu* m){
     1784:	90 e0       	ldi	r25, 0x00	; 0
     1786:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
     178a:	09 c0       	rjmp	.+18     	; 0x179e <make_screen+0xba>
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i+1, 0);
     178c:	20 e0       	ldi	r18, 0x00	; 0
     178e:	30 e0       	ldi	r19, 0x00	; 0
     1790:	a6 01       	movw	r20, r12
@@ -4190,8 +2944,6 @@ make_screen(menu* m){
     1796:	80 e0       	ldi	r24, 0x00	; 0
     1798:	90 e0       	ldi	r25, 0x00	; 0
     179a:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-		}
-		while(c != '\0'){
     179e:	89 81       	ldd	r24, Y+1	; 0x01
     17a0:	88 23       	and	r24, r24
     17a2:	59 f1       	breq	.+86     	; 0x17fa <make_screen+0x116>
@@ -4203,8 +2955,6 @@ make_screen(menu* m){
     17ae:	83 94       	inc	r8
     17b0:	91 2c       	mov	r9, r1
     17b2:	1e c0       	rjmp	.+60     	; 0x17f0 <make_screen+0x10c>
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
     17b4:	24 2d       	mov	r18, r4
     17b6:	35 2d       	mov	r19, r5
     17b8:	a6 01       	movw	r20, r12
@@ -4216,18 +2966,9 @@ make_screen(menu* m){
     17c4:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
     17c8:	01 50       	subi	r16, 0x01	; 1
     17ca:	11 09       	sbc	r17, r1
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i+1, 0);
-		}
-		while(c != '\0'){
-			for(int line = 0; line < 8; line++){
     17cc:	01 15       	cp	r16, r1
     17ce:	11 05       	cpc	r17, r1
     17d0:	89 f7       	brne	.-30     	; 0x17b4 <make_screen+0xd0>
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
-			}
-			c = sm->name[index++];
     17d2:	d3 01       	movw	r26, r6
     17d4:	ed 91       	ld	r30, X+
     17d6:	fc 91       	ld	r31, X
@@ -4241,27 +2982,13 @@ make_screen(menu* m){
     17e6:	e8 e0       	ldi	r30, 0x08	; 8
     17e8:	ae 0e       	add	r10, r30
     17ea:	b1 1c       	adc	r11, r1
-			oled_sram_write_char(startAddress, ">", i+1, 0);
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i+1, 0);
-		}
-		while(c != '\0'){
     17ec:	88 23       	and	r24, r24
     17ee:	29 f0       	breq	.+10     	; 0x17fa <make_screen+0x116>
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
     17f0:	4a 2c       	mov	r4, r10
     17f2:	5b 2c       	mov	r5, r11
     17f4:	02 2d       	mov	r16, r2
     17f6:	13 2d       	mov	r17, r3
     17f8:	dd cf       	rjmp	.-70     	; 0x17b4 <make_screen+0xd0>
-make_screen(menu* m){
-	int startAddress = 0;
-	
-	oled_sram_clear_screen(startAddress);
-	oled_sram_write_string(startAddress, m->name, 0); //Print menu name
-	for (int i = 0; i < m->num_submenues; i++){
     17fa:	c6 01       	movw	r24, r12
     17fc:	ff ef       	ldi	r31, 0xFF	; 255
     17fe:	cf 1a       	sub	r12, r31
@@ -4275,12 +3002,6 @@ make_screen(menu* m){
     180e:	93 07       	cpc	r25, r19
     1810:	0c f4       	brge	.+2      	; 0x1814 <make_screen+0x130>
     1812:	9e cf       	rjmp	.-196    	; 0x1750 <make_screen+0x6c>
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
-			}
-			c = sm->name[index++];
-		}
-	}
-	for (int i = 0; i < m->num_functions; i++){
     1814:	f7 01       	movw	r30, r14
     1816:	86 a9       	ldd	r24, Z+54	; 0x36
     1818:	97 a9       	ldd	r25, Z+55	; 0x37
@@ -4294,33 +3015,17 @@ make_screen(menu* m){
     1828:	71 1c       	adc	r7, r1
     182a:	c1 2c       	mov	r12, r1
     182c:	d1 2c       	mov	r13, r1
-		else{
-			oled_sram_write_char(startAddress, " ", i + m->num_submenues + 1, 0);
-		}
-		while(c != '\0'){
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i + m->num_submenues + 1, index*8);
     182e:	68 94       	set
     1830:	44 24       	eor	r4, r4
     1832:	43 f8       	bld	r4, 3
     1834:	51 2c       	mov	r5, r1
-			}
-			c = sm->name[index++];
-		}
-	}
-	for (int i = 0; i < m->num_functions; i++){
-		char *funcnames = m->name_functions[i];
     1836:	d3 01       	movw	r26, r6
     1838:	8d 90       	ld	r8, X+
     183a:	9d 90       	ld	r9, X+
     183c:	3d 01       	movw	r6, r26
-		
-		int index = 1;
-		char c = funcnames[0];
     183e:	f4 01       	movw	r30, r8
     1840:	80 81       	ld	r24, Z
     1842:	89 83       	std	Y+1, r24	; 0x01
-		if(m->arrow == i + m->num_submenues){
     1844:	d7 01       	movw	r26, r14
     1846:	d8 96       	adiw	r26, 0x38	; 56
     1848:	8d 91       	ld	r24, X+
@@ -4335,7 +3040,6 @@ make_screen(menu* m){
     185a:	84 17       	cp	r24, r20
     185c:	95 07       	cpc	r25, r21
     185e:	61 f4       	brne	.+24     	; 0x1878 <make_screen+0x194>
-			oled_sram_write_char(startAddress, ">", i + m->num_submenues + 1, 0);
     1860:	ac 01       	movw	r20, r24
     1862:	4f 5f       	subi	r20, 0xFF	; 255
     1864:	5f 4f       	sbci	r21, 0xFF	; 255
@@ -4347,9 +3051,6 @@ make_screen(menu* m){
     1870:	90 e0       	ldi	r25, 0x00	; 0
     1872:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
     1876:	0a c0       	rjmp	.+20     	; 0x188c <make_screen+0x1a8>
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i + m->num_submenues + 1, 0);
     1878:	4f 5f       	subi	r20, 0xFF	; 255
     187a:	5f 4f       	sbci	r21, 0xFF	; 255
     187c:	20 e0       	ldi	r18, 0x00	; 0
@@ -4359,8 +3060,6 @@ make_screen(menu* m){
     1884:	80 e0       	ldi	r24, 0x00	; 0
     1886:	90 e0       	ldi	r25, 0x00	; 0
     1888:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
-		}
-		while(c != '\0'){
     188c:	89 81       	ldd	r24, Y+1	; 0x01
     188e:	88 23       	and	r24, r24
     1890:	59 f1       	breq	.+86     	; 0x18e8 <make_screen+0x204>
@@ -4372,8 +3071,6 @@ make_screen(menu* m){
     189c:	a3 f8       	bld	r10, 3
     189e:	b1 2c       	mov	r11, r1
     18a0:	1e c0       	rjmp	.+60     	; 0x18de <make_screen+0x1fa>
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i + m->num_submenues + 1, index*8);
     18a2:	f7 01       	movw	r30, r14
     18a4:	44 89       	ldd	r20, Z+20	; 0x14
     18a6:	55 89       	ldd	r21, Z+21	; 0x15
@@ -4391,18 +3088,9 @@ make_screen(menu* m){
     18be:	0e 94 ff 05 	call	0xbfe	; 0xbfe <oled_sram_write_char>
     18c2:	01 50       	subi	r16, 0x01	; 1
     18c4:	11 09       	sbc	r17, r1
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i + m->num_submenues + 1, 0);
-		}
-		while(c != '\0'){
-			for(int line = 0; line < 8; line++){
     18c6:	01 15       	cp	r16, r1
     18c8:	11 05       	cpc	r17, r1
     18ca:	59 f7       	brne	.-42     	; 0x18a2 <make_screen+0x1be>
-				oled_sram_write_char(startAddress, &c, i + m->num_submenues + 1, index*8);
-			}
-			c = funcnames[index++];
     18cc:	d4 01       	movw	r26, r8
     18ce:	8d 91       	ld	r24, X+
     18d0:	4d 01       	movw	r8, r26
@@ -4410,27 +3098,13 @@ make_screen(menu* m){
     18d4:	b8 e0       	ldi	r27, 0x08	; 8
     18d6:	ab 0e       	add	r10, r27
     18d8:	b1 1c       	adc	r11, r1
-			oled_sram_write_char(startAddress, ">", i + m->num_submenues + 1, 0);
-		}
-		else{
-			oled_sram_write_char(startAddress, " ", i + m->num_submenues + 1, 0);
-		}
-		while(c != '\0'){
     18da:	88 23       	and	r24, r24
     18dc:	29 f0       	breq	.+10     	; 0x18e8 <make_screen+0x204>
-			for(int line = 0; line < 8; line++){
-				oled_sram_write_char(startAddress, &c, i + m->num_submenues + 1, index*8);
     18de:	2a 2c       	mov	r2, r10
     18e0:	3b 2c       	mov	r3, r11
     18e2:	04 2d       	mov	r16, r4
     18e4:	15 2d       	mov	r17, r5
     18e6:	dd cf       	rjmp	.-70     	; 0x18a2 <make_screen+0x1be>
-				oled_sram_write_char(startAddress, &c, i+1, index*8);
-			}
-			c = sm->name[index++];
-		}
-	}
-	for (int i = 0; i < m->num_functions; i++){
     18e8:	ef ef       	ldi	r30, 0xFF	; 255
     18ea:	ce 1a       	sub	r12, r30
     18ec:	de 0a       	sbc	r13, r30
@@ -4443,16 +3117,9 @@ make_screen(menu* m){
     18fa:	d9 06       	cpc	r13, r25
     18fc:	0c f4       	brge	.+2      	; 0x1900 <make_screen+0x21c>
     18fe:	9b cf       	rjmp	.-202    	; 0x1836 <make_screen+0x152>
-				oled_sram_write_char(startAddress, &c, i + m->num_submenues + 1, index*8);
-			}
-			c = funcnames[index++];
-		}
-	}
-	oled_sram_flush(startAddress);
     1900:	80 e0       	ldi	r24, 0x00	; 0
     1902:	90 e0       	ldi	r25, 0x00	; 0
     1904:	0e 94 51 05 	call	0xaa2	; 0xaa2 <oled_sram_flush>
-} 
     1908:	0f 90       	pop	r0
     190a:	0f 90       	pop	r0
     190c:	0f 90       	pop	r0
@@ -4477,12 +3144,6 @@ make_screen(menu* m){
     1932:	08 95       	ret
 
 00001934 <menuSystem>:
-#include "../Game_files/draw.h"
-#include "../Game_files/snake.h"
-#include "../Game_files/pong.h"
-
-
-void menuSystem(){
     1934:	cf 93       	push	r28
     1936:	df 93       	push	r29
     1938:	cd b7       	in	r28, 0x3d	; 61
@@ -4494,7 +3155,6 @@ void menuSystem(){
     1944:	de bf       	out	0x3e, r29	; 62
     1946:	0f be       	out	0x3f, r0	; 63
     1948:	cd bf       	out	0x3d, r28	; 61
-	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
     194a:	4a e3       	ldi	r20, 0x3A	; 58
     194c:	8e 01       	movw	r16, r28
     194e:	0f 5f       	subi	r16, 0xFF	; 255
@@ -4512,8 +3172,6 @@ void menuSystem(){
     1966:	90 e0       	ldi	r25, 0x00	; 0
     1968:	9e 8b       	std	Y+22, r25	; 0x16
     196a:	8d 8b       	std	Y+21, r24	; 0x15
-		
-	menu highscore = {.name = "Highscore", .parent = &mainMenu};
     196c:	de 01       	movw	r26, r28
     196e:	db 96       	adiw	r26, 0x3b	; 59
     1970:	fd 01       	movw	r30, r26
@@ -4527,11 +3185,8 @@ void menuSystem(){
     1980:	2b af       	std	Y+59, r18	; 0x3b
     1982:	1e af       	std	Y+62, r17	; 0x3e
     1984:	0d af       	std	Y+61, r16	; 0x3d
-	mainMenu.submenues[1] = &highscore;
     1986:	b8 87       	std	Y+8, r27	; 0x08
     1988:	af 83       	std	Y+7, r26	; 0x07
-	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 3};
     198a:	fe 01       	movw	r30, r28
     198c:	eb 58       	subi	r30, 0x8B	; 139
     198e:	ff 4f       	sbci	r31, 0xFF	; 255
@@ -4548,41 +3203,32 @@ void menuSystem(){
     19a4:	02 83       	std	Z+2, r16	; 0x02
     19a6:	97 ab       	std	Z+55, r25	; 0x37
     19a8:	86 ab       	std	Z+54, r24	; 0x36
-	playGame.functions[0] = &play_draw;
     19aa:	8c ec       	ldi	r24, 0xCC	; 204
     19ac:	96 e0       	ldi	r25, 0x06	; 6
     19ae:	97 a3       	std	Z+39, r25	; 0x27
     19b0:	86 a3       	std	Z+38, r24	; 0x26
-	playGame.functions[1] = &playSnake;
     19b2:	85 e9       	ldi	r24, 0x95	; 149
     19b4:	9a e0       	ldi	r25, 0x0A	; 10
     19b6:	91 a7       	std	Z+41, r25	; 0x29
     19b8:	80 a7       	std	Z+40, r24	; 0x28
-	playGame.functions[2] = &playPong;
     19ba:	88 ea       	ldi	r24, 0xA8	; 168
     19bc:	99 e0       	ldi	r25, 0x09	; 9
     19be:	93 a7       	std	Z+43, r25	; 0x2b
     19c0:	82 a7       	std	Z+42, r24	; 0x2a
-	playGame.name_functions[0] = "Draw";
     19c2:	86 eb       	ldi	r24, 0xB6	; 182
     19c4:	91 e0       	ldi	r25, 0x01	; 1
     19c6:	97 8b       	std	Z+23, r25	; 0x17
     19c8:	86 8b       	std	Z+22, r24	; 0x16
-	playGame.name_functions[1] = "Snake";
     19ca:	8b eb       	ldi	r24, 0xBB	; 187
     19cc:	91 e0       	ldi	r25, 0x01	; 1
     19ce:	91 8f       	std	Z+25, r25	; 0x19
     19d0:	80 8f       	std	Z+24, r24	; 0x18
-	playGame.name_functions[2] = "Pong";
     19d2:	81 ec       	ldi	r24, 0xC1	; 193
     19d4:	91 e0       	ldi	r25, 0x01	; 1
     19d6:	93 8f       	std	Z+27, r25	; 0x1b
     19d8:	82 8f       	std	Z+26, r24	; 0x1a
-	mainMenu.submenues[0] = &playGame;
     19da:	fe 83       	std	Y+6, r31	; 0x06
     19dc:	ed 83       	std	Y+5, r30	; 0x05
-		
-	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};
     19de:	fa 96       	adiw	r30, 0x3a	; 58
     19e0:	df 01       	movw	r26, r30
     19e2:	1d 92       	st	X+, r1
@@ -4598,55 +3244,32 @@ void menuSystem(){
     19f6:	90 e0       	ldi	r25, 0x00	; 0
     19f8:	97 ab       	std	Z+55, r25	; 0x37
     19fa:	86 ab       	std	Z+54, r24	; 0x36
-	settings.functions[0] = &calibrateJoystick;
     19fc:	8e e0       	ldi	r24, 0x0E	; 14
     19fe:	94 e0       	ldi	r25, 0x04	; 4
     1a00:	97 a3       	std	Z+39, r25	; 0x27
     1a02:	86 a3       	std	Z+38, r24	; 0x26
-	settings.name_functions[0] = "Calibrate Joy";
     1a04:	8f ec       	ldi	r24, 0xCF	; 207
     1a06:	91 e0       	ldi	r25, 0x01	; 1
     1a08:	97 8b       	std	Z+23, r25	; 0x17
     1a0a:	86 8b       	std	Z+22, r24	; 0x16
-	mainMenu.submenues[2] = &settings;
     1a0c:	fa 87       	std	Y+10, r31	; 0x0a
     1a0e:	e9 87       	std	Y+9, r30	; 0x09
-	
-	
-	
-	direction previousDirection = NEUTRAL;
     1a10:	68 94       	set
     1a12:	aa 24       	eor	r10, r10
     1a14:	a2 f8       	bld	r10, 2
-	Joystick joy;
-	menu* currentMenu = &mainMenu;
-	int num_elements;
-	while(1){
-		num_elements = (currentMenu->num_functions+currentMenu->num_submenues);
     1a16:	f8 01       	movw	r30, r16
     1a18:	c6 a8       	ldd	r12, Z+54	; 0x36
     1a1a:	d7 a8       	ldd	r13, Z+55	; 0x37
     1a1c:	e4 88       	ldd	r14, Z+20	; 0x14
     1a1e:	f5 88       	ldd	r15, Z+21	; 0x15
-		joy = getJoystickPosition();
     1a20:	0e 94 77 03 	call	0x6ee	; 0x6ee <getJoystickPosition>
     1a24:	b8 2e       	mov	r11, r24
-		if (joy.D != previousDirection){
     1a26:	a8 16       	cp	r10, r24
     1a28:	09 f4       	brne	.+2      	; 0x1a2c <menuSystem+0xf8>
     1a2a:	51 c0       	rjmp	.+162    	; 0x1ace <menuSystem+0x19a>
-	direction previousDirection = NEUTRAL;
-	Joystick joy;
-	menu* currentMenu = &mainMenu;
-	int num_elements;
-	while(1){
-		num_elements = (currentMenu->num_functions+currentMenu->num_submenues);
     1a2c:	b6 01       	movw	r22, r12
     1a2e:	6e 0d       	add	r22, r14
     1a30:	7f 1d       	adc	r23, r15
-		joy = getJoystickPosition();
-		if (joy.D != previousDirection){
-			switch(joy.D){
     1a32:	f1 e0       	ldi	r31, 0x01	; 1
     1a34:	8f 17       	cp	r24, r31
     1a36:	69 f1       	breq	.+90     	; 0x1a92 <menuSystem+0x15e>
@@ -4659,10 +3282,6 @@ void menuSystem(){
     1a44:	b8 16       	cp	r11, r24
     1a46:	79 f0       	breq	.+30     	; 0x1a66 <menuSystem+0x132>
     1a48:	42 c0       	rjmp	.+132    	; 0x1ace <menuSystem+0x19a>
-				case NEUTRAL:
-					break;
-				case UP:
-					currentMenu->arrow = (currentMenu->arrow - 1 + num_elements)%num_elements;
     1a4a:	d8 01       	movw	r26, r16
     1a4c:	d8 96       	adiw	r26, 0x38	; 56
     1a4e:	8d 91       	ld	r24, X+
@@ -4675,10 +3294,7 @@ void menuSystem(){
     1a5e:	f8 01       	movw	r30, r16
     1a60:	91 af       	std	Z+57, r25	; 0x39
     1a62:	80 af       	std	Z+56, r24	; 0x38
-					break;
     1a64:	34 c0       	rjmp	.+104    	; 0x1ace <menuSystem+0x19a>
-				case DOWN:
-					currentMenu->arrow = (currentMenu->arrow + 1)%num_elements;
     1a66:	d8 01       	movw	r26, r16
     1a68:	d8 96       	adiw	r26, 0x38	; 56
     1a6a:	8d 91       	ld	r24, X+
@@ -4689,10 +3305,7 @@ void menuSystem(){
     1a76:	f8 01       	movw	r30, r16
     1a78:	91 af       	std	Z+57, r25	; 0x39
     1a7a:	80 af       	std	Z+56, r24	; 0x38
-					break;
     1a7c:	28 c0       	rjmp	.+80     	; 0x1ace <menuSystem+0x19a>
-				case LEFT:
-						currentMenu = (currentMenu->parent) ? currentMenu->parent : currentMenu;
     1a7e:	d8 01       	movw	r26, r16
     1a80:	12 96       	adiw	r26, 0x02	; 2
     1a82:	2d 91       	ld	r18, X+
@@ -4703,9 +3316,6 @@ void menuSystem(){
     1a8c:	01 f1       	breq	.+64     	; 0x1ace <menuSystem+0x19a>
     1a8e:	89 01       	movw	r16, r18
     1a90:	1e c0       	rjmp	.+60     	; 0x1ace <menuSystem+0x19a>
-					break;
-				case RIGHT:
-					if(currentMenu->arrow < currentMenu->num_submenues){
     1a92:	f8 01       	movw	r30, r16
     1a94:	20 ad       	ldd	r18, Z+56	; 0x38
     1a96:	31 ad       	ldd	r19, Z+57	; 0x39
@@ -4714,7 +3324,6 @@ void menuSystem(){
     1a9c:	24 17       	cp	r18, r20
     1a9e:	35 07       	cpc	r19, r21
     1aa0:	4c f4       	brge	.+18     	; 0x1ab4 <menuSystem+0x180>
-						currentMenu = currentMenu->submenues[currentMenu->arrow];
     1aa2:	2e 5f       	subi	r18, 0xFE	; 254
     1aa4:	3f 4f       	sbci	r19, 0xFF	; 255
     1aa6:	22 0f       	add	r18, r18
@@ -4724,9 +3333,6 @@ void menuSystem(){
     1aae:	00 81       	ld	r16, Z
     1ab0:	11 81       	ldd	r17, Z+1	; 0x01
     1ab2:	0d c0       	rjmp	.+26     	; 0x1ace <menuSystem+0x19a>
-					}
-					else{
-						currentMenu->functions[(currentMenu->arrow - currentMenu->num_submenues)]();
     1ab4:	24 1b       	sub	r18, r20
     1ab6:	35 0b       	sbc	r19, r21
     1ab8:	2d 5e       	subi	r18, 0xED	; 237
@@ -4740,12 +3346,6 @@ void menuSystem(){
     1ac8:	f0 81       	ld	r31, Z
     1aca:	e0 2d       	mov	r30, r0
     1acc:	09 95       	icall
-					break;
-			}
-		}
-		previousDirection = joy.D;
-		
-		make_screen(currentMenu);
     1ace:	c8 01       	movw	r24, r16
     1ad0:	0e 94 72 0b 	call	0x16e4	; 0x16e4 <make_screen>
     1ad4:	ff ef       	ldi	r31, 0xFF	; 255
@@ -4757,12 +3357,6 @@ void menuSystem(){
     1ae0:	e1 f7       	brne	.-8      	; 0x1ada <menuSystem+0x1a6>
     1ae2:	00 c0       	rjmp	.+0      	; 0x1ae4 <menuSystem+0x1b0>
     1ae4:	00 c0       	rjmp	.+0      	; 0x1ae6 <menuSystem+0x1b2>
-					break;
-					default:
-					break;
-			}
-		}
-		previousDirection = joy.D;
     1ae6:	ab 2c       	mov	r10, r11
     1ae8:	96 cf       	rjmp	.-212    	; 0x1a16 <menuSystem+0xe2>
 

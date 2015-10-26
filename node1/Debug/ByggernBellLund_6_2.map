@@ -100,6 +100,23 @@ Discarded input sections
 
  .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5/crtm162.o
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5/crtm162.o
+ .text          0x00000000        0x0 Driver_files/EEPROM_driver.o
+ .data          0x00000000        0x0 Driver_files/EEPROM_driver.o
+ .bss           0x00000000        0x0 Driver_files/EEPROM_driver.o
+ .text.EEPROM_read
+                0x00000000        0xe Driver_files/EEPROM_driver.o
+ .text.EEPROM_write
+                0x00000000       0x14 Driver_files/EEPROM_driver.o
+ .debug_info    0x00000000       0xdc Driver_files/EEPROM_driver.o
+ .debug_abbrev  0x00000000       0x8b Driver_files/EEPROM_driver.o
+ .debug_loc     0x00000000       0x24 Driver_files/EEPROM_driver.o
+ .debug_aranges
+                0x00000000       0x28 Driver_files/EEPROM_driver.o
+ .debug_ranges  0x00000000       0x18 Driver_files/EEPROM_driver.o
+ .debug_line    0x00000000       0xe0 Driver_files/EEPROM_driver.o
+ .debug_str     0x00000000      0x1d6 Driver_files/EEPROM_driver.o
+ .comment       0x00000000       0x31 Driver_files/EEPROM_driver.o
+ .debug_frame   0x00000000       0x34 Driver_files/EEPROM_driver.o
  .text          0x00000000        0x0 Driver_files/message_handler.o
  .data          0x00000000        0x0 Driver_files/message_handler.o
  .bss           0x00000000        0x0 Driver_files/message_handler.o
@@ -108,6 +125,27 @@ Discarded input sections
  .text          0x00000000        0x0 Driver_files/SPI_driver.o
  .data          0x00000000        0x0 Driver_files/SPI_driver.o
  .bss           0x00000000        0x0 Driver_files/SPI_driver.o
+ .text          0x00000000        0x0 Game_files/highscore.o
+ .data          0x00000000        0x0 Game_files/highscore.o
+ .bss           0x00000000        0x0 Game_files/highscore.o
+ .text.highscore_save
+                0x00000000       0x92 Game_files/highscore.o
+ .text.highscore_get
+                0x00000000       0xdc Game_files/highscore.o
+ .text.highscore_leaderboard
+                0x00000000       0x54 Game_files/highscore.o
+ .text.higscore_add
+                0x00000000       0xf8 Game_files/highscore.o
+ .debug_info    0x00000000      0x3a4 Game_files/highscore.o
+ .debug_abbrev  0x00000000      0x150 Game_files/highscore.o
+ .debug_loc     0x00000000      0x5d1 Game_files/highscore.o
+ .debug_aranges
+                0x00000000       0x38 Game_files/highscore.o
+ .debug_ranges  0x00000000       0x40 Game_files/highscore.o
+ .debug_line    0x00000000      0x183 Game_files/highscore.o
+ .debug_str     0x00000000      0x24a Game_files/highscore.o
+ .comment       0x00000000       0x31 Game_files/highscore.o
+ .debug_frame   0x00000000      0x148 Game_files/highscore.o
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
@@ -478,8 +516,10 @@ Linker script and memory map
 
 Address of section .data set to 0x800100
 LOAD c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5/crtm162.o
+LOAD Driver_files/EEPROM_driver.o
 LOAD Driver_files/message_handler.o
 LOAD Driver_files/SPI_driver.o
+LOAD Game_files/highscore.o
 LOAD main.o
 LOAD Driver_files/adc_driver.o
 LOAD Driver_files/CAN_driver.o
