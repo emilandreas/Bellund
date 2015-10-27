@@ -47,7 +47,7 @@ void handle_message(){
 			//Joystick
 			J = getJoystickPosition();
 			m.id = JOY;
-			m.length = 7;
+			m.length = 8;
 			m.data[0] = J.X;
 			m.data[1] = J.Y;
 			m.data[2] = J.D;
