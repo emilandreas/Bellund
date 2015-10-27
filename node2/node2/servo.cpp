@@ -10,7 +10,7 @@ void servo_init(){
 }
 void servo_set(int pos){
   //Map from % to angle in degrees
-  int angle = map(pos, -100, 100,150 ,50);
+  int angle = map(pos, 0, 100,180 ,0);
   myServo.write(angle);
 }
 

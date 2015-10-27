@@ -21,19 +21,10 @@ extern "C" {
 void setup() {
   uart_setup();
   
-  //Start servo
-  //servo_init();
-  
   //Start can
   CAN_init();
 
-  //start motor
-  motor_init();
   handler_init();
-  init_solenoid();
-
-  //Initiate PID(kp, ki, kd, ms)
-  init_PID(1.25, 1, -0.05, 16);
 }
 int count = 0;
 long int enc_val = 0;
@@ -50,8 +41,6 @@ void loop(){
   */
   printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
   delay(25);
-  printf("Direction: %i", get_joy().D);
-  //controll_motor(-controllSignal());
 
 }
 

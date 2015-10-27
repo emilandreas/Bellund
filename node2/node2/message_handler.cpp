@@ -26,7 +26,7 @@ void handle_message(){
   //Decide what to do
   switch(m.id){
     case JOY:
-      update_joy(m.data[0], m.data[1], m.data[2]);
+      update_controller(m.data[0], m.data[1], m.data[2], m.data[3], m.data[4], m.data[5], m.data[6], m.data[7]);
       break;
     default:
       break;

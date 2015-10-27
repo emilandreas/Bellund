@@ -13,5 +13,6 @@
 void init_PID(double kp, double ki, double kd, double ms);
 double controllSignal();
 void pid(double error);
+void set_pid_reference(int ref);
 
 #endif /* PID_H_ */

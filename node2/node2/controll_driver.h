@@ -10,14 +10,20 @@
 #define CONTROLL_DRIVER_H_
 typedef enum  {LEFT, RIGHT, UP, DOWN, NEUTRAL} direction;
 typedef struct { 
+  uint8_t left_slider;
+  uint8_t right_slider;
+  uint8_t left_button;
+  uint8_t right_button;
   int8_t X;
   int8_t Y;
+  int8_t joy_button;
   direction D;
-} Joystick;
+} Controller;
 
-Joystick get_joy();
-void update_joy(int x, int y, int d);
+Controller get_controller();
 
-void req_joy();
+void update_controller( int x, int y, int d, uint8_t joy_button, uint8_t left_slider, uint8_t right_slider, uint8_t left_button, uint8_t right_button);
+
+void req_controller(); //request update on controller input
 
 #endif /* CONTROLL_DRIVER_H_ */

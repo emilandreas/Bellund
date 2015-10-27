@@ -6,19 +6,23 @@ extern "C"{
 #include "CAN_driver.h"
 }
 
-Joystick joy;
+Controller joy;
 
-Joystick get_joy(){
+Controller get_controller(){
   return joy;
 }
 
-void update_joy(int x, int y, int d){
+void update_controller( int x, int y, int d,uint8_t joy_button, uint8_t left_slider, uint8_t right_slider, uint8_t left_button, uint8_t right_button){
+    joy.left_slider = left_slider;
+    joy.right_slider = right_slider;
+    joy.left_button = left_button;
+    joy.right_button = right_button;
     joy.X = x;
     joy.Y = y;
     joy.D = (direction)d;
 }
 
-void req_joy(){
+void req_controller(){
   Message m;
   m.id = JOYREQ;
   m.length = 0;

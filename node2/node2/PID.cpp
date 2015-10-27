@@ -13,6 +13,8 @@
 
 #define k 3 //current index
 
+
+volatile int reference = 50;
 volatile double u[k+1] = {0};
 volatile double e[k+1] = {0};
 double a, b, c, T;
@@ -42,16 +44,13 @@ void init_PID(double Kp, double Ki, double Kd, double ms){
 volatile int counter = 0;
 ISR(TIMER2_COMPA_vect){
   //Run pid with error
-  int pos = (get_position() - 50)*2;
-  int ref = get_joy().X;
-  req_joy();
-
-  if(++counter%2 == 0){
-    counter = 0;
-    printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
-  }
   
-  pid(pos - ref);
+//  if(++counter%2 == 0){
+//    counter = 0;
+//    printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
+//  }
+  
+  pid(reference - get_position());
 }
 
 void pid(double error){
@@ -66,4 +65,7 @@ void pid(double error){
   u[k] = u[k - 1] + a*e[k] + b*e[k-1] + c*e[k-2];
 }
 
+void set_pid_reference(int ref){
+  reference = ref;
+}
 
