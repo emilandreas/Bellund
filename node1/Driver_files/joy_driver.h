@@ -17,11 +17,14 @@ typedef struct {
 	int8_t X;
 	int8_t Y;
 	direction D;
+	uint8_t Button;
 } Joystick;
 
 typedef struct {
 	int left;
 	int right;
+	uint8_t leftButton;
+	uint8_t rightButton;
 } Slider;
 
 Joystick getJoystickPosition();
