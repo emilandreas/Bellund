@@ -6,13 +6,39 @@ var socket = io();
 var mode = 0;
 var modeSelect = function(m){
   mode = m;
+  tiltX = 50;
+  key = 50;
 }
 
 
 
 //Handle key presses
+var key = 50;
+var KeyShoot = 0; 
+var increment = 0;
+
+var shoot = function(s){
+  KeyShoot = s;
+}
+
+var arrow = function(k){
+  if (key + k <= 100 && key + k >= 0){
+    key += k;
+  }
+}
+
+var setIncrement = function(i){
+  increment = i;
+}
+
+//increment key every 20 ms
+window.setInterval(function(){
+  arrow(increment);
+}, 20);
+
+
 //function to check when key is pressed: 
-var key = 'NONE';
+//Handel keyboard presses
 document.onkeydown = checkKey;
 function checkKey(e) {
 
@@ -20,26 +46,28 @@ function checkKey(e) {
 
     if (e.keyCode == '38') {
       // up arrow
-      key = 'UP';
+      shoot(1);
     }
     else if (e.keyCode == '40') {
       // down arrow
-      key = 'DOWN';
+      shoot(1);
     }
     else if (e.keyCode == '37') {
       // left arrow
-      key = 'LEFT';
+      arrow(-1);
     }
     else if (e.keyCode == '39') {
       // right arrow
-      key = 'RIGHT';
+      arrow(1);
     }
 }
 
 document.onkeyup = unCheckKey;
 function unCheckKey() {
-  key = 'NONE'
+  shoot(0);
 }
+
+
 
 
 //Handle arrow presses on screen
@@ -51,51 +79,54 @@ window.addEventListener('load', function(){
 
     //Handle touch 
     upArrow.addEventListener('touchstart', function(e){
-      arrow('UP'); //Register command
+      shoot(1);
       e.preventDefault(); // Prevent long press (left mouse butten press) box
     }, false)
 
     leftArrow.addEventListener('touchstart', function(e){
-      arrow('LEFT');
+      increment = -1;
       e.preventDefault();
     }, false)
 
     rightArrow.addEventListener('touchstart', function(e){
-      arrow('RIGHT');
+      increment = 1;
       e.preventDefault();
     }, false)
 
     //Handle touch release
     upArrow.addEventListener('touchend', function(e){
-      arrow('NONE');
+      shoot(0);
       e.preventDefault();
     }, false)
 
     leftArrow.addEventListener('touchend', function(e){
-      arrow('NONE');
+      increment = 0;
       e.preventDefault();
     }, false)
 
     rightArrow.addEventListener('touchend', function(e){
-      arrow('NONE');
+      increment = 0;
       e.preventDefault();
     }, false)
  
 }, false)
 
-var arrow = function(k){
-  key = k;
-}
 
 
 
 //Handle device orientation
-var orX = 0;
-var orY = 0;
+var tiltX = 0;
+var tiltY = 0;
 function tilt(a){
-  orX = Math.round(a[0]);
-  orY = Math.round(a[1]);
-  //socket.emit('controll', a);
+  tiltX = Math.round(a[0]) + 50;
+  if(tiltX > 100){
+    tiltX = 100;
+  }
+  if (tiltX < 0){
+    tiltX = 0;
+  }
+  tiltY = (Math.abs(Math.round(a[1])) < 30)? 1 : 0;
+  //tiltY = Math.round(a[1]);
 }
 
 
@@ -116,7 +147,14 @@ if (window.DeviceOrientationEvent) {
 
 //Send controll input to node.js
 var sendControlls = function(){
-  socket.emit('controll', [mode, key, orX, orY]);
+  switch(mode){
+    case 0:
+      socket.emit('controll', [key, KeyShoot]);
+      break;
+    case 1:
+      socket.emit('controll', [tiltX, tiltY]);
+      break;
+  }
 }
 
 

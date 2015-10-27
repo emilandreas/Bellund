@@ -30,13 +30,13 @@ Select controll mode<br>
 <table style="width:100%">
   <tr>
     <td></td>
-    <td><img id = "upArrow" onmousedown="arrow('UP');" onmouseup="arrow('NONE')" src="/images/up.png" alt="Up" style="width:150px;height:150px;"></td> 
+    <td><img id = "upArrow" onmousedown="shoot(1);" onmouseup="shoot(0);" src="/images/up.png" alt="Up" style="width:150px;height:150px;"></td> 
     <td></td>
   </tr>
   <tr>
-    <td><img id = "leftArrow" onmousedown="arrow('LEFT');" onmouseup="arrow('NONE')" src="/images/left.png" alt="Left" style="width:150px;height:150px;"></td>
+    <td><img id = "leftArrow" onmousedown="setIncrement(-1);" onmouseup="setIncrement(0);" src="/images/left.png" alt="Left" style="width:150px;height:150px;"></td>
     <td></td> 
-    <td><img id = "rightArrow"onmousedown="arrow('RIGHT');" onmouseup="arrow('NONE')" src="/images/right.png" alt="Right" style="width:150px;height:150px;"></td>
+    <td><img id = "rightArrow"onmousedown="setIncrement(1);" onmouseup="setIncrement(0);" src="/images/right.png" alt="Right" style="width:150px;height:150px;"></td>
   </tr>
 </table><br>
 

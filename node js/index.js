@@ -37,8 +37,8 @@ app.get('/score', function(req, res){
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('controll', function(c){
-    //console.log('controlls: ' + c);
-    sp.write("1," + c + "\n");
+    console.log('controlls: ' + c);
+    //sp.write("1," + c + "\n");
   });
   socket.on('score', function(){
     console.log('Get highscore');
