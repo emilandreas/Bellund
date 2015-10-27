@@ -48,7 +48,7 @@ ISR(TIMER2_COMPA_vect){
 
   if(++counter%2 == 0){
     counter = 0;
-    //printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
+    printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
   }
   
   pid(pos - ref);

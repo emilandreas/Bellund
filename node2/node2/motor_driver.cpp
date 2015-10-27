@@ -109,12 +109,12 @@ double get_position(){
 }
 
 void calibrate_encoder(){
-  controll_motor(-80);   //Find left boundary
-  delay(2000);
+  controll_motor(-100);   //Find left boundary
+  delay(5000);
   reset_encoder();
   
-  controll_motor(80);  //Find right boundary
-  delay(2000);
+  controll_motor(150);  //Find right boundary
+  delay(5000);
   max_encoder_val = read_encoder();
   controll_motor(0);
 }

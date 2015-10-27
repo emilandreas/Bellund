@@ -16,6 +16,7 @@ extern "C" {
 #include "controll_driver.h"
 #include "message_handler.h"
 #include "PID.h"
+#include "solenoid_driver.h"
 
 void setup() {
   uart_setup();
@@ -29,6 +30,7 @@ void setup() {
   //start motor
   motor_init();
   handler_init();
+  init_solenoid();
 
   //Initiate PID(kp, ki, kd, ms)
   init_PID(1.25, 1, -0.05, 16);
@@ -46,9 +48,11 @@ void loop(){
   req_joy();
   //printf("JoyX: %i JoyY: %i",get_joy().X, get_joy().Y);
   */
-  //printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
+  printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
   delay(25);
-  controll_motor(-controllSignal());
+  printf("Direction: %i", get_joy().D);
+  //controll_motor(-controllSignal());
+
 }
 
 
