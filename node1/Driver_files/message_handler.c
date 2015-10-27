@@ -37,18 +37,30 @@ void handle_message(){
 	CAN_receive(&m);
 	
 	Joystick J;
+	Slider S;
 	
 	//Decide what to do
 	switch(m.id){
 		case JOY:
 			break;
 		case JOYREQ:
+			//Joystick
 			J = getJoystickPosition();
 			m.id = JOY;
-			m.length = 3;
+			m.length = 7;
 			m.data[0] = J.X;
 			m.data[1] = J.Y;
 			m.data[2] = J.D;
+			m.data[3] = J.Button;
+			
+			//Slider
+			S = getSliderPosition();
+			m.data[4] = S.left;
+			m.data[5] = S.right;
+			m.data[6] = S.leftButton;
+			m.data[7] = S.rightButton;
+			
+			//Send can message
 			CAN_transmit(&m);
 			break;
 		default:
