@@ -62,7 +62,7 @@ sp.open(function (error) {
     });
     sp.write("ls\n", function(err, results) {
       console.log('err ' + err);
-      //console.log('results ' + results);
+      console.log('results ' + results);
     });
   }
 });
