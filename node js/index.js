@@ -14,7 +14,7 @@ var io = require('socket.io')(http);
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
-var sp = new SerialPort("COM5", {
+var sp = new SerialPort("COM10", {
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
 }, false);
@@ -38,7 +38,7 @@ io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('controll', function(c){
     console.log('controlls: ' + c);
-    //sp.write("1," + c + "\n");
+    sp.write("1," + c + "\n");
   });
   socket.on('score', function(){
     console.log('Get highscore');
@@ -47,7 +47,7 @@ io.on('connection', function(socket){
 });
 
 //Start http server
-http.listen(3000, function(){
+http.listen(80, function(){
   console.log('listening on port 3000');
 });
 

@@ -32,8 +32,7 @@ void setup() {
 int count = 0;
 long int enc_val = 0;
 void loop(){
-  printf("MAIN!");
-  play_pingpong(JOY_X, R_SLIDE, JOY_Y);
+  play_pingpong(JOY_X, R_SLIDER, JOY_Y);
   /*
   enc_val = get_position();
   if (++count%10 == 0){
@@ -45,7 +44,7 @@ void loop(){
   //printf("JoyX: %i JoyY: %i",get_joy().X, get_joy().Y);
   */
   
-  printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
+  //printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
   delay(25);
 
 }
