@@ -59,9 +59,9 @@ int input_select(int input_num){
       return (get_controller().Y + 100)/2;
     case JOY_BUTTON:
       return get_controller().joy_button;
-    case L_SLIDE:
+    case L_SLIDER:
       return get_controller().left_slider;
-    case R_SLIDE:
+    case R_SLIDER:
       return get_controller().right_slider;
     case L_BUTTON:
       return get_controller().left_button;

@@ -12,8 +12,8 @@
 #define JOY_X 0
 #define JOY_Y 1 
 #define JOY_BUTTON 2
-#define L_SLIDE 3
-#define R_SLIDE 4
+#define L_SLIDER 3
+#define R_SLIDER 4
 #define L_BUTTON 5
 #define R_BUTTON 6
 #define WEB_CARRIGE 7

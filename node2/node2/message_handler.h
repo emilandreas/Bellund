@@ -18,8 +18,9 @@ void handler_init();
 void handle_message();
 
 // Message types
-#define JOY			0
-#define JOYREQ		1
-#define HighScore	2
+#define JOY             0
+#define JOYREQ          1
+#define HighScore       2
+#define START_PINGPONG  3
 
 #endif /* MESSAGE_HANDLER_H_ */

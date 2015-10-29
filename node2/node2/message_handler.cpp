@@ -9,6 +9,8 @@
 #include <avr/interrupt.h>
 #include "controll_driver.h"
 #include "message_handler.h"
+#include "pingpong.h"
+
 
 extern "C"{
 #include "CAN_driver.h"
@@ -28,6 +30,8 @@ void handle_message(){
     case JOY:
       update_controller(m.data[0], m.data[1], m.data[2], m.data[3], m.data[4], m.data[5], m.data[6], m.data[7]);
       break;
+    case START_PINGPONG:
+      play_pingpong(JOY_X, R_SLIDER, JOY_Y);
     default:
       break;
     
