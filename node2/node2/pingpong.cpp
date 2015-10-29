@@ -20,25 +20,33 @@ void pingpong_init(){
   servo_init();  //Controlling the racket
   motor_init();  
   init_solenoid();
-  init_PID(1.25, 1, -0.05, 16); //Initiate PID(kp, ki, kd, ms);
+  init_PID(2.25, 1, 0, 16); //Initiate PID(kp, ki, kd, ms);
 }
 
 void play_pingpong(int servo_input, int carrige_input, int shoot_input){
   int shot_count = 0;
   unsigned long int start_time = millis();
-  
-  while(get_diode()){
+  int is_shooting = 0;
+  while(true){
     
     delay(50);
     //shoot
-    if (input_select(shoot_input))shoot(); 
+    if (input_select(shoot_input)>90 && !is_shooting){
+      is_shooting = 1;
+      shoot(); 
+    }
+    else if(input_select(shoot_input)< 90){
+      is_shooting = 0;
+    }
 
     //servo
     servo_set(input_select(servo_input));
 
     //carrige
+    //printf("Slider: %i \n", input_select(carrige_input));
     set_pid_reference(input_select(carrige_input));
-    controll_motor(-controllSignal()); 
+    controll_motor(controllSignal()); 
+    req_controller();
   }
   
 }

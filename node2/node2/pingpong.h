@@ -21,7 +21,7 @@
 #define WEB_BUTTON 9
 
 void pingpong_init();
-void play_pingpong();
+void play_pingpong(int servo_input, int carrige_input, int shoot_input);
 int input_select(int input_num);
 
 #endif /* PINGPONG_H_ */

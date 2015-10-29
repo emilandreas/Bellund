@@ -1,0 +1,3 @@
+Arduino port:
+16: SERVO
+17: SHOOT

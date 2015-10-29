@@ -31,10 +31,10 @@ void init_PID(double Kp, double Ki, double Kd, double ms){
   c = Kd/T;
 
   //set up interrupt
-  TCCR2A = 0;                           // set entire TCCR1A register to 0
-  TCCR2B = 0;                           // same for TCCR1B
+  TCCR2A = 0;                           // set entire TCCR2A register to 0
+  TCCR2B = 0;                           // same for TCCR2B
   TCNT2  = 0;                           //initialize counter value to 0
-  TCCR2B |= (1 << CS22) | (1 << CS20);  // Set CS10 and CS12 bits for 1024 prescaler
+  TCCR2B |= (1 << CS22) | (1 << CS20);  // Set CS20 and CS22 bits for 1024 prescaler
   OCR2A = F_CPU/1024*T;                 // set compare match register for (1/T)Hz increments
   TCCR2B |= (1 << WGM21);               // turn on CTC mode
   TIMSK2 |= (1 << OCIE2A);              // enable timer compare interrupt
@@ -44,11 +44,12 @@ void init_PID(double Kp, double Ki, double Kd, double ms){
 volatile int counter = 0;
 ISR(TIMER2_COMPA_vect){
   //Run pid with error
-  
-//  if(++counter%2 == 0){
-//    counter = 0;
-//    printf("e[k]: %i \t u[k] %i \t pos: %i \t ref: %i \n", (int)e[k], (int)u[k], (int)pos, (int)ref);
-//  }
+
+  /*
+  if(++counter%2 == 0){
+    counter = 0;
+    printf("e[k]: %i \t u[k] %i \t ref: %i \n", (int)e[k], (int)u[k], (int)reference);
+  }*/
   
   pid(reference - get_position());
 }
@@ -59,8 +60,9 @@ void pid(double error){
     u[i] = u[i+1];
     e[i] = e[i+1];
   }
-  e[k] = error;
   
+  e[k] = error;
+
   //Z-transform of pid reguator
   u[k] = u[k - 1] + a*e[k] + b*e[k-1] + c*e[k-2];
 }

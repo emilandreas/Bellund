@@ -21,8 +21,8 @@ typedef struct {
 } Joystick;
 
 typedef struct {
-	int left;
-	int right;
+	uint8_t left;
+	uint8_t right;
 	uint8_t leftButton;
 	uint8_t rightButton;
 } Slider;

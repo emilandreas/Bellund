@@ -17,6 +17,7 @@ extern "C" {
 #include "message_handler.h"
 #include "PID.h"
 #include "solenoid_driver.h"
+#include "pingpong.h"
 
 void setup() {
   uart_setup();
@@ -25,10 +26,14 @@ void setup() {
   CAN_init();
 
   handler_init();
+  pingpong_init();
+  
 }
 int count = 0;
 long int enc_val = 0;
 void loop(){
+  printf("MAIN!");
+  play_pingpong(JOY_X, R_SLIDE, JOY_Y);
   /*
   enc_val = get_position();
   if (++count%10 == 0){
@@ -39,6 +44,7 @@ void loop(){
   req_joy();
   //printf("JoyX: %i JoyY: %i",get_joy().X, get_joy().Y);
   */
+  
   printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
   delay(25);
 
