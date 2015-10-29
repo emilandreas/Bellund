@@ -8,6 +8,18 @@ extern "C"{
 
 Controller joy;
 
+Web w;
+
+Web get_web(){
+  return w;
+}
+
+void update_web(int x, int slider, int button){
+  w.X = x;
+  w.S = slider;
+  w.B = button;
+}
+
 Controller get_controller(){
   return joy;
 }

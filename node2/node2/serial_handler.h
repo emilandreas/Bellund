@@ -10,6 +10,7 @@
 #define SERIAL_HANDLER_H_
 
 void init_serial();
+void serialEvent();
 void handel_command(String str);
 void parse_command(String str, int command[]);
 

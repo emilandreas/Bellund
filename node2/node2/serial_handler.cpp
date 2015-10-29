@@ -8,6 +8,7 @@
 #include <arduino.h>
 #include <avr/interrupt.h>
 #include "serial_handler.h"
+#include "controll_driver.h"
 
 String inputString = "";        // a string to hold incoming data
 
@@ -31,12 +32,13 @@ void serialEvent() {
   }
 }
 
+int command[8] = {0};
 void handel_command(String str){
-  int command[8] = {0};
   //First letter in string is opcode
   switch(str[0]){
     case '1':
       parse_command(str, command);
+      update_web(50, command[0], command[1]*100);
       break;
     case '2':
       break;
