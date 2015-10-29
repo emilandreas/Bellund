@@ -44,6 +44,7 @@ C_SRCS +=  \
 ../Driver_files/message_handler.c \
 ../Driver_files/SPI_driver.c \
 ../Game_files/highscore.c \
+../Game_files/pingpong.c \
 ../main.c \
 ../Driver_files/adc_driver.c \
 ../Driver_files/CAN_driver.c \
@@ -69,6 +70,7 @@ Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
 Driver_files/SPI_driver.o \
 Game_files/highscore.o \
+Game_files/pingpong.o \
 main.o \
 Driver_files/adc_driver.o \
 Driver_files/CAN_driver.o \
@@ -87,6 +89,7 @@ Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
 Driver_files/SPI_driver.o \
 Game_files/highscore.o \
+Game_files/pingpong.o \
 main.o \
 Driver_files/adc_driver.o \
 Driver_files/CAN_driver.o \
@@ -105,6 +108,7 @@ Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
 Driver_files/SPI_driver.d \
 Game_files/highscore.d \
+Game_files/pingpong.d \
 main.d \
 Driver_files/adc_driver.d \
 Driver_files/CAN_driver.d \
@@ -123,6 +127,7 @@ Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
 Driver_files/SPI_driver.d \
 Game_files/highscore.d \
+Game_files/pingpong.d \
 main.d \
 Driver_files/adc_driver.d \
 Driver_files/CAN_driver.d \
@@ -150,6 +155,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

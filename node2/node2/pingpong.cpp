@@ -14,10 +14,10 @@
 #include "PID.h"
 #include "pingpong.h"
 #include "solenoid_driver.h"
-#include "serial_handler.h"
+#include "message_handler.h"
+
 
 void pingpong_init(){
-  init_serial();
   servo_init();  //Controlling the racket
   motor_init();  
   init_solenoid();
@@ -25,12 +25,13 @@ void pingpong_init(){
 }
 
 void play_pingpong(int servo_input, int carrige_input, int shoot_input){
+  pingpong_init();
   int shot_count = 0;
   unsigned long int start_time = millis();
   int is_shooting = 0;
-  while(true){
-    
-    delay(30);
+  while(pingpong_message_status()){
+    printf("inside pingpong\n");
+    delay(50);
     //shoot
     if (input_select(shoot_input)>90 && !is_shooting){
       is_shooting = 1;
@@ -44,11 +45,10 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     servo_set(input_select(servo_input));
 
     //carrige
-    printf("%i \t %i \t %i\n", input_select(carrige_input), input_select(servo_input), input_select(shoot_input));
+    //printf("Slider: %i \n", input_select(carrige_input));
     set_pid_reference(input_select(carrige_input));
     controll_motor(controllSignal()); 
     req_controller();
-    serialEvent();
   }
   
 }
@@ -70,11 +70,11 @@ int input_select(int input_num){
     case R_BUTTON:
       return get_controller().right_button;
     case WEB_CARRIGE:
-      return get_web().X;
+      break;
     case WEB_SLIDER:
-      return get_web().S;
+      break;
     case WEB_BUTTON:
-      return get_web().B;
+      break;
     default:
       break;
   }

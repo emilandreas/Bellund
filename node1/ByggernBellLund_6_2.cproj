@@ -134,6 +134,12 @@
     <Compile Include="Game_files\highscore.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Game_files\pingpong.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Game_files\pingpong.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>

@@ -10,6 +10,8 @@ Driver_files\SPI_driver.c
 
 Game_files\highscore.c
 
+Game_files\pingpong.c
+
 main.c
 
 Driver_files\adc_driver.c

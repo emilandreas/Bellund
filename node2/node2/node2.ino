@@ -26,26 +26,22 @@ void setup() {
   CAN_init();
 
   handler_init();
-  pingpong_init();
-  
+  init_pingpong_message();
 }
 int count = 0;
 long int enc_val = 0;
 void loop(){
-  printf("MAIN!");
-  play_pingpong(JOY_X, R_SLIDER, JOY_Y);
-  /*
-  enc_val = get_position();
+  printf("pingpong_message_status: %i \n",pingpong_message_status());
+  if(pingpong_message_status()){
+    play_pingpong(JOY_X, R_SLIDER, JOY_Y);
+  }
+  
   if (++count%10 == 0){
-      printf("encoder: %li \n",enc_val);
+      printf("pingpong_message_status: %i \n",pingpong_message_status());
       count = 0;
   }
-  controll_motor(get_joy().X);
-  req_joy();
-  //printf("JoyX: %i JoyY: %i",get_joy().X, get_joy().Y);
-  */
+
   
-  printf("encoder: %i, %i \n",read_encoder(), (int)get_position());
   delay(25);
 
 }

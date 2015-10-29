@@ -9,7 +9,8 @@
 #ifndef PINGPONG_H_
 #define PINGPONG_H_
 
-
+void start_pingpong();
+void wait_mode(char* message);
 
 
 

@@ -12,6 +12,8 @@
 #include "../Game_files/draw.h"
 #include "../Game_files/snake.h"
 #include "../Game_files/pong.h"
+#include "../Game_files/pingpong.h"
+
 
 
 void menuSystem(){
@@ -20,13 +22,15 @@ void menuSystem(){
 	menu highscore = {.name = "Highscore", .parent = &mainMenu};
 	mainMenu.submenues[1] = &highscore;
 	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 3};
+	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 4};
 	playGame.functions[0] = &play_draw;
 	playGame.functions[1] = &playSnake;
 	playGame.functions[2] = &playPong;
+	playGame.functions[3] = &start_pingpong;
 	playGame.name_functions[0] = "Draw";
 	playGame.name_functions[1] = "Snake";
 	playGame.name_functions[2] = "Pong";
+	playGame.name_functions[3] = "Ping Pong";
 	mainMenu.submenues[0] = &playGame;
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};
@@ -78,7 +82,7 @@ void menuSystem(){
 	
 }
 
-make_screen(menu* m){
+void make_screen(menu* m){
 	int startAddress = 0;
 	
 	oled_sram_clear_screen(startAddress);
