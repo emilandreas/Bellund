@@ -35,6 +35,7 @@ void serialEvent() {
 int command[8] = {0};
 void handel_command(String str){
   //First letter in string is opcode
+  //Serial.println(str);
   switch(str[0]){
     case '1':
       parse_command(str, command);

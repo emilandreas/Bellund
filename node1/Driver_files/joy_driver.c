@@ -18,22 +18,22 @@
 float xMean = 127;
 float yMean = 127;
 
-Slider getSliderPosition(){
+Slider get_slider_position(){
 	Slider slide;
 	slide.left = ((get_adc(1))*100)/255;
 	slide.right = ((get_adc(0))*100)/255;
 	return slide;
 }
 
-Joystick getJoystickPosition(){
+Joystick get_joystick_position(){
 	Joystick joy;
 	joy.Y = ((get_adc(2)-yMean)*100)/yMean;
 	joy.X = ((get_adc(3)-xMean)*100)/xMean;
-	joy.D = getJoystickDirection(joy.X, joy.Y);
+	joy.D = get_joystick_direction(joy.X, joy.Y);
 	return joy;
 }
 
-direction getJoystickDirection(int x, int y){
+direction get_joystick_direction(int x, int y){
 	
 	if(fabs(x) < 50 && fabs(y) < 50){
 		return NEUTRAL;
@@ -57,7 +57,7 @@ direction getJoystickDirection(int x, int y){
 	}
 }
 
-void calibrateJoystick(){
+void calibrate_joystick(){
 	uint8_t yMax = 127;
 	uint8_t yMin = 127;
 	uint8_t xMax = 127;

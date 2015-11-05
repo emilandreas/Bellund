@@ -14,5 +14,6 @@ void init_PID(double kp, double ki, double kd, double ms);
 double controllSignal();
 void pid(double error);
 void set_pid_reference(int ref);
+void stop_pid();
 
 #endif /* PID_H_ */

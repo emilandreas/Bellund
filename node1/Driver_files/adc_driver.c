@@ -14,9 +14,7 @@ void init_adc(){
 
 uint8_t get_adc(int channel){
 	volatile char *adc = (char *) 0x1400; // Start address adc
-	uint16_t adc_size = 0x400;
-	
-	
+
 	adc[0] = 4 + (channel%4);
 	_delay_us(200);
 	return adc[0];

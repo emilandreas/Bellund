@@ -9,8 +9,10 @@
 #include "message_handler.h"
 #include "CAN_driver.h"
 #include "joy_driver.h"
+#include "../Game_files/pingpong.h"
 
 volatile int handelingMessage = 0;
+
 
 void init_handler(){
 	// Set pin as input (PD3 = INT1)
@@ -36,34 +38,47 @@ void handle_message(){
 	Message m;
 	CAN_receive(&m);
 	
-	Joystick J;
-	Slider S;
-	
 	//Decide what to do
 	switch(m.id){
 		case JOY:
 			break;
 		case JOYREQ:
-			//Joystick
-			J = getJoystickPosition();
-			m.id = JOY;
-			m.length = 8;
-			m.data[0] = J.X;
-			m.data[1] = J.Y;
-			m.data[2] = J.D;
-			m.data[3] = J.Button;
-			
-			//Slider
-			S = getSliderPosition();
-			m.data[4] = S.left;
-			m.data[5] = S.right;
-			m.data[6] = S.leftButton;
-			m.data[7] = S.rightButton;
-			
-			//Send can message
-			CAN_transmit(&m);
+			send_controlls();
+			break;
+		case GAME_STATUS:
+			state_set(m.data[0]);
+			score_set(m.data[1]);
 			break;
 		default:
 			break;
 	}
 }
+
+void send_controlls(){
+	Message m;
+	Joystick J;
+	Slider S;
+		
+	//Joystick
+	J = get_joystick_position();
+	m.id = JOY;
+	m.length = 8;
+	m.data[0] = J.X;
+	m.data[1] = J.Y;
+	m.data[2] = J.D;
+	m.data[3] = J.Button;
+		
+	//Slider
+	S = get_slider_position();
+	m.data[4] = S.left;
+	m.data[5] = S.right;
+	m.data[6] = S.leftButton;
+	m.data[7] = S.rightButton;
+		
+	//Send can message
+	CAN_transmit(&m);
+}
+
+
+
+

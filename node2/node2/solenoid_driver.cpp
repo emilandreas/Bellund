@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <arduino.h>
 
-#define SHOOTPIN 17
+#define SHOOTPIN 19
 
 void init_solenoid(){
   pinMode(SHOOTPIN, OUTPUT);

@@ -16,13 +16,13 @@ typedef struct {
 } highscore;
 
 //Define Game memory spaces
-#define BYGGERN	0x00
-#define SNAKE	0x40
-#define PONG	0x80
+#define PINGPONG	0x00
+#define SNAKE		0x40
+#define PONG		0x80
 
 //Functions
 void highscore_save(uint8_t game, highscore *score); // saves hs in position
-uint8_t higscore_add(uint8_t game, highscore *score); // adds hs to eeprom and returns position of HS
+uint8_t highscore_add(uint8_t game, highscore *score); // adds hs to eeprom and returns position of HS
 highscore highscore_get(uint8_t game, uint8_t position); //get highscore at position(1-16)
 void highscore_leaderboard(uint8_t game, highscore leaderboard[], int length); //Saves length HS's in leaderboard
 

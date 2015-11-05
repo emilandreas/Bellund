@@ -19,7 +19,7 @@ void play_draw(){
 	
 	Joystick joy;
 	while (1){
-		joy = getJoystickPosition();
+		joy = get_joystick_position();
 		switch(joy.D){
 			case NEUTRAL:
 				break;

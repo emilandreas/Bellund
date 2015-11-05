@@ -18,32 +18,21 @@ extern "C" {
 #include "PID.h"
 #include "solenoid_driver.h"
 #include "pingpong.h"
+#include "state_machine.h"
+#include "serial_handler.h"
 
 void setup() {
-  uart_setup();
-  
+  uart_setup();  
   //Start can
   CAN_init();
-
   handler_init();
-  init_pingpong_message();
+  init_serial();
 }
+
 int count = 0;
-long int enc_val = 0;
 void loop(){
-  printf("pingpong_message_status: %i \n",pingpong_message_status());
-  if(pingpong_message_status()){
-    play_pingpong(JOY_X, R_SLIDER, JOY_Y);
-  }
-  
-  if (++count%10 == 0){
-      printf("pingpong_message_status: %i \n",pingpong_message_status());
-      count = 0;
-  }
-
-  
-  delay(25);
-
+  state_machine();
+  serialEvent();
 }
 
 

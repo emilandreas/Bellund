@@ -76,7 +76,7 @@ void playSnake(){
 	oled_sram_clear_screen(0);
 	//gamplay while loop
 	while (!detectCollision(first->next, first->x, first->y)){
-		Joystick j = getJoystickPosition();
+		Joystick j = get_joystick_position();
 		direction D = j.D;
 		S = (D == NEUTRAL) ? S : D;
 		//Create and set up next snake segment

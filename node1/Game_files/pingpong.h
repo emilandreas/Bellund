@@ -9,9 +9,11 @@
 #ifndef PINGPONG_H_
 #define PINGPONG_H_
 
-void start_pingpong();
-void wait_mode(char* message);
+typedef enum{SLEEP = 0, PLAY_PINGPONG = 1}State;
 
+void play_pingpong();
+void state_set(State state);
+void score_set(uint8_t score);
 
 
 #endif /* PINGPONG_H_ */

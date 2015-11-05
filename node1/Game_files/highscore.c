@@ -23,7 +23,7 @@ void highscore_save(uint8_t game, highscore *score){
 	}
 }
 
-uint8_t higscore_add(uint8_t game, highscore *score){
+uint8_t highscore_add(uint8_t game, highscore *score){
 	highscore leaderboard[16];
 	highscore_leaderboard(game, leaderboard, 16);
 	score->place = 0;

@@ -58,7 +58,7 @@ void updateBallPosition(Ball *ball){
 	else ball->posX--;
 }
 void updateSliderPosition(Slider *slide){
-	*slide = getSliderPosition();
+	*slide = get_slider_position();
 	slide->left = (slide->left)*(63-RACKETSIZE)/100;
 	slide->right = (slide->right)*(63-RACKETSIZE)/100;
 } 

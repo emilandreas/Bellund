@@ -71,3 +71,10 @@ void set_pid_reference(int ref){
   reference = ref;
 }
 
+void stop_pid(){
+  for(int i = 0; i < k + 1; i++){
+    u[i] = 0;
+    e[i] = 0;
+  }
+}
+

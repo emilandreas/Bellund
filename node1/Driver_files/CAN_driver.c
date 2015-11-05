@@ -63,4 +63,3 @@ int CAN_receive(Message *m){
 	}
 	return 1;
 }
-

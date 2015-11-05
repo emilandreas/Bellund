@@ -15,7 +15,6 @@
 #include "../Game_files/pingpong.h"
 
 
-
 void menuSystem(){
 	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
 		
@@ -26,7 +25,7 @@ void menuSystem(){
 	playGame.functions[0] = &play_draw;
 	playGame.functions[1] = &playSnake;
 	playGame.functions[2] = &playPong;
-	playGame.functions[3] = &start_pingpong;
+	playGame.functions[3] = &play_pingpong;
 	playGame.name_functions[0] = "Draw";
 	playGame.name_functions[1] = "Snake";
 	playGame.name_functions[2] = "Pong";
@@ -34,11 +33,11 @@ void menuSystem(){
 	mainMenu.submenues[0] = &playGame;
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};
-	settings.functions[0] = &calibrateJoystick;
+	settings.functions[0] = &calibrate_joystick;
 	settings.name_functions[0] = "Calibrate Joy";
 	mainMenu.submenues[2] = &settings;
 	
-	
+
 	
 	direction previousDirection = NEUTRAL;
 	Joystick joy;
@@ -46,7 +45,7 @@ void menuSystem(){
 	int num_elements;
 	while(1){
 		num_elements = (currentMenu->num_functions+currentMenu->num_submenues);
-		joy = getJoystickPosition();
+		joy = get_joystick_position();
 		if (joy.D != previousDirection){
 			switch(joy.D){
 				case NEUTRAL:
@@ -78,6 +77,7 @@ void menuSystem(){
 		make_screen(currentMenu);
 		_delay_ms(100);		
 	}
+	
 	
 	
 }

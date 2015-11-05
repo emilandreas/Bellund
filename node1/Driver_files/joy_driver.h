@@ -27,9 +27,9 @@ typedef struct {
 	uint8_t rightButton;
 } Slider;
 
-Joystick getJoystickPosition();
-direction getJoystickDirection(int x, int y);
-void calibrateJoystick();
-Slider getSliderPosition();
+Joystick get_joystick_position();
+direction get_joystick_direction(int x, int y);
+void calibrate_joystick();
+Slider get_slider_position();
 
 #endif /* JOY_DRIVER_H_ */
