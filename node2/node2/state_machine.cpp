@@ -36,7 +36,7 @@ void state_machine(){
         }
         break;
     }
-    printf("state: %i\n", current_state);
+    //printf("state: %i\n", current_state);
     current_state = next_state;
 }
 

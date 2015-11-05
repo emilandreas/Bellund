@@ -32,29 +32,16 @@ void play_pingpong(){
 	oled_sram_clear_screen(0);
 	oled_sram_write_string(0, "Playing pingpong", 2);
 	char score[16];
-	printf("State %i \n", current_state);
 	while(current_state == PLAY_PINGPONG){
 		_delay_ms(100);
+		printf("State %i \n\r", current_state);
 		send_controlls();
 		sprintf(score, "Score: %d", current_score);
 		oled_sram_write_string(0, score, 4);
 		oled_sram_flush(0);
 	}
 	
-	
-	highscore hs;
-	hs.name[0] = 'e';
-	hs.name[1] = 'a';
-	hs.name[2] = 'l';
-	hs.score = current_score;
-	hs.place = 0;
-	//highscore_add(PINGPONG, &hs);
-	_delay_ms(50);
-	highscore hslist[16];
-	highscore_leaderboard(PINGPONG, hslist, 10);
-	for (int i = 0; i < 16; i++){
-		printf("leaderboard: %i, %s, %i\n\r", hslist[i].place, hslist[i].name, hslist[i].score );
-	}
+	highscore_prompt(PINGPONG, current_score);
 }
 
 

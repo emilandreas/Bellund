@@ -26,6 +26,11 @@ typedef struct {
   uint8_t B;
 } Web;
 
+typedef struct{
+  uint8_t X;
+  uint8_t Y;
+}Cam;
+
 Web get_web();
 
 void update_web(int x, int slider, int button);
@@ -35,5 +40,6 @@ Controller get_controller();
 void update_controller( int x, int y, int d, uint8_t joy_button, uint8_t left_slider, uint8_t right_slider, uint8_t left_button, uint8_t right_button);
 
 void req_controller(); //request update on controller input
+
 
 #endif /* CONTROLL_DRIVER_H_ */

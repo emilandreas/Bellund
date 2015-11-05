@@ -19,5 +19,6 @@ void send_controlls();
 #define JOY				0
 #define JOYREQ			1
 #define GAME_STATUS		2
+#define HIGHSCORE		3
 
 #endif /* MESSAGE_HANDLER_H_ */

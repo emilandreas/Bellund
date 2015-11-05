@@ -52,6 +52,7 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     is_shooting = 1;
     shoot(); 
     shot_count++;
+    send_status(PLAY_PINGPONG);
   }
   else if(input_select(shoot_input)< 90){
     is_shooting = 0;
@@ -70,7 +71,6 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     delay(50);
     send_status(SLEEP);
     stop_pid();
-    send_status(PLAY_PINGPONG);
   }
 }
 

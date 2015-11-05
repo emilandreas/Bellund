@@ -14,7 +14,8 @@ Interface_files/menu.d Interface_files/menu.o: ../Interface_files/menu.c \
  ../Interface_files/../Game_files/draw.h \
  ../Interface_files/../Game_files/snake.h \
  ../Interface_files/../Game_files/pong.h \
- ../Interface_files/../Game_files/pingpong.h
+ ../Interface_files/../Game_files/pingpong.h \
+ ../Interface_files/../Game_files/highscore.h
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay.h:
 
@@ -47,3 +48,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../Interface_files/../Game_files/pong.h:
 
 ../Interface_files/../Game_files/pingpong.h:
+
+../Interface_files/../Game_files/highscore.h:

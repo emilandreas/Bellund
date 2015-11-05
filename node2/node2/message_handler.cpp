@@ -25,9 +25,9 @@ void handle_message(){
   Message m;
   CAN_receive(&m);  
   //Decide what to do
+  printf("MSG: %i\n", m.id);
   switch(m.id){
     case JOY:
-    printf("mottatt besked!");
       update_controller(m.data[0], m.data[1], m.data[2], m.data[3], m.data[4], m.data[5], m.data[6], m.data[7]);
       break;
     case GAME_STATUS:

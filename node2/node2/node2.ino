@@ -20,6 +20,7 @@ extern "C" {
 #include "pingpong.h"
 #include "state_machine.h"
 #include "serial_handler.h"
+#include "camera_driver.h"
 
 void setup() {
   uart_setup();  
@@ -27,10 +28,12 @@ void setup() {
   CAN_init();
   handler_init();
   init_serial();
+  camera_init();
 }
 
 int count = 0;
 void loop(){
+  //camera_test();
   state_machine();
   serialEvent();
 }

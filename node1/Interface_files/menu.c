@@ -13,13 +13,20 @@
 #include "../Game_files/snake.h"
 #include "../Game_files/pong.h"
 #include "../Game_files/pingpong.h"
+#include "../Game_files/highscore.h"
 
 
 void menuSystem(){
 	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
 		
-	menu highscore = {.name = "Highscore", .parent = &mainMenu};
+	menu highscore = {.name = "Highscore", .parent = &mainMenu, .num_functions = 3, .num_submenues = 0};
 	mainMenu.submenues[1] = &highscore;
+	highscore.functions[0] = &highscore_print_snake;
+	highscore.functions[1] = &highscore_print_pong;
+	highscore.functions[2] = &highscore_print_pingpong;
+	highscore.name_functions[0] = "Snake";
+	highscore.name_functions[1] = "Pong";
+	highscore.name_functions[2] = "Ping Pong";
 	
 	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 4};
 	playGame.functions[0] = &play_draw;
@@ -32,9 +39,11 @@ void menuSystem(){
 	playGame.name_functions[3] = "Ping Pong";
 	mainMenu.submenues[0] = &playGame;
 		
-	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 1};
+	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 2};
 	settings.functions[0] = &calibrate_joystick;
+	settings.functions[1] = &highscore_clear_all;
 	settings.name_functions[0] = "Calibrate Joy";
+	settings.name_functions[1] = "Clear highscore";
 	mainMenu.submenues[2] = &settings;
 	
 

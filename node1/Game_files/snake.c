@@ -11,6 +11,7 @@
 #include <util/delay.h>
 #include "../Driver_files/oled_driver.h"
 #include <stdlib.h>
+#include "highscore.h"
 
 
 int detectCollision(segment *s, int x, int y){
@@ -121,5 +122,16 @@ void playSnake(){
 		drawBoard(first, food);
 		_delay_ms(100);
 	}
-
+	
+	//Game finished free memory and find score
+	int score = 0;
+	while(first != last){
+		segment* temp = first;
+		first = first->next;
+		free(temp);
+		score++;
+	}
+	free(first);
+	
+	highscore_prompt(SNAKE, score-4);
 }

@@ -10,6 +10,7 @@
 #include "CAN_driver.h"
 #include "joy_driver.h"
 #include "../Game_files/pingpong.h"
+#include "../Game_files/highscore.h"
 
 volatile int handelingMessage = 0;
 
@@ -49,6 +50,8 @@ void handle_message(){
 			state_set(m.data[0]);
 			score_set(m.data[1]);
 			break;
+		case HIGHSCORE:
+			send_highscore();
 		default:
 			break;
 	}
@@ -79,6 +82,21 @@ void send_controlls(){
 	CAN_transmit(&m);
 }
 
-
+void send_highscore(){
+	highscore laederboard[16];
+	highscore_leaderboard(PINGPONG, laederboard, 16);
+	Message m;
+	m.id = HIGHSCORE;
+	m.length = 5;
+	for (int i = 0; i < 16; i++){
+		m.data[0] = laederboard[i].place;
+		m.data[1] = laederboard[i].name[0];
+		m.data[2] = laederboard[i].name[1];
+		m.data[3] = laederboard[i].name[2];
+		m.data[4] = laederboard[i].score;
+		CAN_transmit(&m);
+	}
+	
+}
 
 
