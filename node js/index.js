@@ -14,7 +14,7 @@ var io = require('socket.io')(http);
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
-var sp = new SerialPort("COM10", {
+var sp = new SerialPort("COM5", {
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
 }, false);
@@ -33,6 +33,8 @@ app.get('/score', function(req, res){
   res.sendFile('www/score.html', { root: __dirname });
 });
 
+var leaderboard = [[]];//[['ABM', 100], ['EAL', 50], ['TOM', 10]]
+
 //Handle socket io events
 io.on('connection', function(socket){
   console.log('a user connected');
@@ -42,13 +44,13 @@ io.on('connection', function(socket){
   });
   socket.on('score', function(){
     console.log('Get highscore');
-    socket.emit('score', [['ABM', 100], ['EAL', 50], ['TOM', 10]]);
+    socket.emit('score', leaderboard);
   });
 });
 
 //Start http server
 http.listen(80, function(){
-  console.log('listening on port 3000');
+  console.log('listening on port 80');
 });
 
 //Handle serial communication
@@ -59,6 +61,10 @@ sp.open(function (error) {
     console.log('open');
     sp.on('data', function(data) {
       console.log('data received: ' + data);
+      var arr = data.split(",");
+      if (Number(arr[0]) == 2 ){ //if highscore recieved
+        leaderboard[Number(arr[1])-1] = [arr[2], Number(arr[3])]; //Add highscore to leaaderboard
+      }
     });
     sp.write("ls\n", function(err, results) {
       console.log('err ' + err);
