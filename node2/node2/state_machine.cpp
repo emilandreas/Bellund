@@ -17,6 +17,7 @@ void state_machine(){
     switch(current_state){
       case SLEEP:
         switch(next_state){
+          case PLAY_PINGPONG_SELF:
           case PLAY_PINGPONG_WEB:
           case PLAY_PINGPONG_JOY:
             pingpong_init();
@@ -25,6 +26,7 @@ void state_machine(){
             break;
         }
         break;
+      case PLAY_PINGPONG_SELF:
       case PLAY_PINGPONG_WEB:
       case PLAY_PINGPONG_JOY:
         switch(next_state){
@@ -33,6 +35,9 @@ void state_machine(){
             break;
           case PLAY_PINGPONG_JOY:
             play_pingpong(JOY_X, R_SLIDER, JOY_Y);
+            break;
+          case PLAY_PINGPONG_SELF:
+            play_pingpong(JOY_X, CAM_X, JOY_Y);
             break;
           case SLEEP:
             break;

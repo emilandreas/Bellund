@@ -11,11 +11,44 @@
 
 PixyI2C pixy;
 
+uint16_t ball_pos_x = 150;
+uint16_t ball_pos_y = 150;
+
 void camera_init(){
   //start pixy I2C driver
   pixy.init();
 }
 
+void update_ball_pos(){
+  if (pixy.getBlocks()){
+    ball_pos_x = pixy.blocks[0].x;
+    ball_pos_y = pixy.blocks[0].y;
+  }
+}
+
+uint16_t get_ball_pos_x(){
+  update_ball_pos();
+  int value = map(ball_pos_x,280,50, 0, 99); // 0, 319 is left, right limit of pixi
+  if (value > 100){
+    value = 100;
+  }
+  else if (value < 0){
+    value = 0;
+  }
+  return value;
+}
+
+uint16_t get_ball_pos_y(){
+  update_ball_pos();
+  int value = map(ball_pos_x,280,50, 0, 99); // 0, 319 is left, right limit of pixi
+  if (value > 100){
+    value = 100;
+  }
+  else if (value < 0){
+    value = 0;
+  }
+  return value;
+}
 
 void camera_test(){
   int i = 0;

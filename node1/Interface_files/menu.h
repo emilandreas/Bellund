@@ -27,5 +27,6 @@ typedef struct {
 
 
 void menuSystem();
+void make_screen(menu* m);
 
 #endif /* MENU_H_ */

@@ -50,7 +50,7 @@ int read_encoder(){
     digitalWrite(SEL, LOW);
     
     //Wait about 20 microseconds
-    _delay_us(150);
+    _delay_us(20);
     
     //Read MSB
     val |= (reverse_byte(PINK) << 8);
@@ -59,7 +59,7 @@ int read_encoder(){
     digitalWrite(SEL, HIGH);
 
     //Wait about 20 microseconds
-    _delay_us(150);
+    _delay_us(20);
     
     //Read LSB
     val |= reverse_byte(PINK);
@@ -109,11 +109,9 @@ double get_position(){
 }
 
 void calibrate_encoder(){
-  printf("GO TO LEFT");
   controll_motor(-80);   //Find left boundary
   delay(3000);
   reset_encoder();
-  printf("GO TO RIGHT");
   controll_motor(80);  //Find right boundary
   delay(3000);
   max_encoder_val = read_encoder();

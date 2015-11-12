@@ -7,14 +7,14 @@
 #include <avr/io.h>
 #include <arduino.h>
 #include <avr/interrupt.h>
-#include "motor_driver.h"
+//#include "motor_driver.h"
 #include "controll_driver.h"
 #include "PID.h"
 
 #define k 3 //current index
 
 
-volatile int reference = 50;
+volatile int error = 0;
 volatile double u[k+1] = {0};
 volatile double e[k+1] = {0};
 double a, b, c, T;
@@ -51,7 +51,7 @@ ISR(TIMER2_COMPA_vect){
     printf("e[k]: %i \t u[k] %i \t ref: %i \n", (int)e[k], (int)u[k], (int)reference);
   }*/
   
-  pid(reference - get_position());
+  pid(error);
 }
 
 void pid(double error){
@@ -67,8 +67,8 @@ void pid(double error){
   u[k] = u[k - 1] + a*e[k] + b*e[k-1] + c*e[k-2];
 }
 
-void set_pid_reference(int ref){
-  reference = ref;
+void set_pid_error(int e){
+  error = e;
 }
 
 void stop_pid(){

@@ -33,7 +33,7 @@ void play_pingpong(uint8_t state){
 	oled_sram_clear_screen(0);
 	oled_sram_write_string(0, "Playing pingpong", 2);
 	char score[16];
-	while(current_state == PLAY_PINGPONG_WEB || current_state == PLAY_PINGPONG_JOY){
+	while(current_state == PLAY_PINGPONG_WEB || current_state == PLAY_PINGPONG_JOY || current_state == PLAY_PINGPONG_SELF){
 		_delay_ms(100);
 		printf("State %i \n\r", current_state);
 		send_controlls();
@@ -52,6 +52,11 @@ void play_pingpong_web(){
 void play_pingpong_joy(){
 	play_pingpong(PLAY_PINGPONG_JOY);
 }
+
+void play_pingpong_self(){
+	play_pingpong(PLAY_PINGPONG_SELF);
+}
+
 
 void state_set(State state){
 	

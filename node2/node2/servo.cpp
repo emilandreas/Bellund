@@ -7,7 +7,8 @@ Servo myServo;
 int prev_angle = 0;
 
 void servo_init(){
-  myServo.attach(18,900,2100);
+  myServo.attach(6,900,2100);
+
 }
 void servo_set(int pos){
   //Map from % to angle in degrees

@@ -9,6 +9,10 @@
 #ifndef _CAMERA_DRIVER_H_
 #define _CAMERA_DRIVER_H_
 
+uint16_t get_ball_pos_x();
+
+uint16_t get_ball_pos_y();
+
 void camera_init();
 void camera_test();
 

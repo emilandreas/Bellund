@@ -32,7 +32,6 @@ int main(void)
 	printf("Reset?");
     while(1)
     {
-	
 		menuSystem();
 		//printf("adc output: x = %i\t\t y = %i\t\t Direction = %i\n\r", get_adc(1),get_adc(0),joy.D);
 		/*

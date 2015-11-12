@@ -9,6 +9,7 @@
 #include "menu.h"
 #include "../Driver_files/oled_driver.h"
 #include "../Driver_files/joy_driver.h"
+#include "../Driver_files/music_driver.h"
 #include "../Game_files/draw.h"
 #include "../Game_files/snake.h"
 #include "../Game_files/pong.h"
@@ -17,10 +18,10 @@
 
 
 void menuSystem(){
-	menu mainMenu = {.name = "Main menu", .num_submenues = 3};
+	menu mainMenu = {.name = "Main menu", .num_submenues = 4};
 		
 	menu highscore = {.name = "Highscore", .parent = &mainMenu, .num_functions = 3, .num_submenues = 0};
-	mainMenu.submenues[1] = &highscore;
+	mainMenu.submenues[2] = &highscore;
 	highscore.functions[0] = &highscore_print_snake;
 	highscore.functions[1] = &highscore_print_pong;
 	highscore.functions[2] = &highscore_print_pingpong;
@@ -28,25 +29,41 @@ void menuSystem(){
 	highscore.name_functions[1] = "Pong";
 	highscore.name_functions[2] = "Ping Pong";
 	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 5};
+	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 3, .num_submenues = 1};
 	playGame.functions[0] = &play_draw;
 	playGame.functions[1] = &playSnake;
 	playGame.functions[2] = &playPong;
-	playGame.functions[3] = &play_pingpong_web;
-	playGame.functions[4] = &play_pingpong_joy;
 	playGame.name_functions[0] = "Draw";
 	playGame.name_functions[1] = "Snake";
 	playGame.name_functions[2] = "Pong";
-	playGame.name_functions[3] = "Ping Pong WEB";
-	playGame.name_functions[4] = "Ping Pong JOY";
 	mainMenu.submenues[0] = &playGame;
+	
+	
+	menu ping_pong = {.name = "Ping Pong", .parent = &playGame, .num_functions = 3};
+	ping_pong.functions[0] = &play_pingpong_joy;
+	ping_pong.functions[1] = &play_pingpong_web;
+	ping_pong.functions[2] = &play_pingpong_self;
+	ping_pong.name_functions[0] = "Normal Control";
+	ping_pong.name_functions[1] = "Web Control";
+	ping_pong.name_functions[2] = "Self Controlled";
+	playGame.submenues[0] = &ping_pong;
+	
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 2};
 	settings.functions[0] = &calibrate_joystick;
 	settings.functions[1] = &highscore_clear_all;
 	settings.name_functions[0] = "Calibrate Joy";
 	settings.name_functions[1] = "Clear highscore";
-	mainMenu.submenues[2] = &settings;
+	mainMenu.submenues[3] = &settings;
+	
+	menu spotify = {.name = "Spotify", .parent = &mainMenu, .num_functions = 2};
+	spotify.functions[0] = &play_lisa;
+	spotify.functions[1] = &play_mario;
+	spotify.name_functions[0] = "Lisa";
+	spotify.name_functions[1] = "play_mario";
+	mainMenu.submenues[1] = &spotify;
+	
+	
 	
 
 	

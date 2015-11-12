@@ -32,7 +32,7 @@ void handle_message(){
       update_controller(m.data[0], m.data[1], m.data[2], m.data[3], m.data[4], m.data[5], m.data[6], m.data[7]);
       break;
     case GAME_STATUS:
-      state_set((State)(int)m.data[0]);
+      state_set((State)m.data[0]);
       break;
     case HIGHSCORE:
       pass_highscore_to_web(m.data[0], m.data[1], m.data[2], m.data[3], m.data[4]);

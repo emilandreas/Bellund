@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/pgmspace.h>
 #include "music_driver.h"
 
 #define NOTE_PORT PORTE
@@ -7,11 +8,58 @@
 #define NOTE_DDR DDRE
 
 
-
-int lisa_notes[] = {NOTE_C4,NOTE_D4,NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_E4, NOTE_E4, NOTE_D4,NOTE_D4,NOTE_D4,NOTE_D4, NOTE_C4 };
-int lisa_beats[] = {300,300,300,300, 600,600, 300,300,300,300, 1200, 300,300,300,300, 600,600, 300,300,300,300, 1200 };
-int lisa_song_length = 22;
-
+const uint16_t PROGMEM mario_notes[] = {
+	NOTE_E7, NOTE_E7, 0, NOTE_E7,
+	0, NOTE_C7, NOTE_E7, 0,
+	NOTE_G7, 0, 0,  0,
+	NOTE_G6, 0, 0, 0,
+		
+	NOTE_C7, 0, 0, NOTE_G6,
+	0, 0, NOTE_E6, 0,
+	0, NOTE_A6, 0, NOTE_B6,
+	0, NOTE_AS6, NOTE_A6, 0,
+		
+	NOTE_G6, NOTE_E7, NOTE_G7,
+	NOTE_A7, 0, NOTE_F7, NOTE_G7,
+	0, NOTE_E7, 0, NOTE_C7,
+	NOTE_D7, NOTE_B6, 0, 0,
+		
+	NOTE_C7, 0, 0, NOTE_G6,
+	0, 0, NOTE_E6, 0,
+	0, NOTE_A6, 0, NOTE_B6,
+	0, NOTE_AS6, NOTE_A6, 0,
+		
+	NOTE_G6, NOTE_E7, NOTE_G7,
+	NOTE_A7, 0, NOTE_F7, NOTE_G7,
+	0, NOTE_E7, 0, NOTE_C7,
+	NOTE_D7, NOTE_B6, 0, 0
+};
+const uint16_t PROGMEM mario_beats[] = {
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+		
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+		
+	9, 9, 9,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+		
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+		
+	9, 9, 9,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+	12, 12, 12, 12,
+};
 void music_init(){
 	//set data direction out
 	DDRE |= (1 << NOTE_PIN);
@@ -28,7 +76,7 @@ void play_note(float duration, float period){
 	int cycles = duration*1000/period; //number of cycles to toggle pin to make frequency
 	int half_period = period/2;
 
-	for(int i = 0; i < cycles; i++){
+	for(uint16_t i = 0; i < cycles; i++){
 		NOTE_PORT |= (1 << NOTE_PIN);
 		delay_us(half_period);
 		NOTE_PORT &= ~(1 << NOTE_PIN);
@@ -37,13 +85,31 @@ void play_note(float duration, float period){
 }
 
 
-//void play_song(int notes[], int beats[], int song_length){
-void play_song(){
+void play_song(uint16_t notes[], uint16_t beats[], uint8_t song_length, uint16_t tempo_scale){
 	music_init();
-	for(int i = 0; i < lisa_song_length; i++ ){
-		play_note(lisa_beats[i], 1000000/lisa_notes[i]);
-		_delay_us(500);		
+	for(int i = 0; i < song_length; i++ ){
+		//if (notes[i] == 0){
+			//delay_us(tempo_scale*beats[i]);
+		//}
+		//else{
+			play_note(tempo_scale*beats[i], 1000000/notes[i]);
+			_delay_us(500);		
+		//}
 	}
+}
+
+void play_lisa(){
+	const uint16_t lisa_notes[] = {NOTE_C4,NOTE_D4,NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_E4, NOTE_E4, NOTE_D4,NOTE_D4,NOTE_D4,NOTE_D4, NOTE_C4 };
+	const uint16_t lisa_beats[] = {200,200,200,200, 400,400, 200,200,200,200, 800, 200,200,200,200, 400,400, 200,200,200,200, 800 };
+	uint8_t song_length = 22;
+	play_song(lisa_notes, lisa_beats, song_length, 1);
+}
+
+void play_mario(){
+
+	uint8_t song_length = 78;
+	play_song(mario_notes, mario_beats, song_length, 10000);
+	
 }
 
 #define NOTE_B0  31

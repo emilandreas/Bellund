@@ -17,6 +17,7 @@
 #include "CAN_driver.h"
 #include "state_machine.h"
 #include "ir_driver.h"
+#include "camera_driver.h"
 
 int shot_count;
 unsigned long int start_time;
@@ -27,6 +28,7 @@ void pingpong_init(){
   motor_init();  
   init_solenoid();
   init_PID(2.25, 1, 0, 16); //Initiate PID(kp, ki, kd, ms);
+  camera_init();
   shot_count = 0;
   start_time = millis();
   is_shooting = 0;
@@ -55,13 +57,11 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
   }
   //servo
   servo_set(input_select(servo_input));
-
+  printf("X: %u\t\t Y: %u\n", get_ball_pos_x(), get_ball_pos_y());
   //carrige
-  //printf("Slider: %i \n", input_select(carrige_input));
-  set_pid_reference(input_select(carrige_input));
-  controll_motor(controllSignal()); 
-  //req_controller();
-  
+  set_pid_error(input_select(carrige_input) - get_position());
+  controll_motor(controllSignal());
+//  printf("Get_diode: %i\n",get_diode());
   if(!get_diode()){
     state_set(SLEEP);
     delay(50);
@@ -96,6 +96,12 @@ int input_select(int input_num){
       break;
     case WEB_BUTTON:
       return get_web().B;
+      break;
+    case CAM_X:
+      return get_ball_pos_x();
+      break;
+    case CAM_Y:
+      return get_ball_pos_y();
       break;
     default:
       break;
