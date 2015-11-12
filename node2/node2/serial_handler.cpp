@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include "serial_handler.h"
 #include "controll_driver.h"
+#include "message_handler.h"
 
 String inputString = "";        // a string to hold incoming data
 
@@ -42,6 +43,8 @@ void handel_command(String str){
       update_web(50, command[0], command[1]*100);
       break;
     case '2':
+      parse_command(str, command);
+      request_highscore(command[0]); //Get highscore from node1 through CAN
       break;
     default:
       break;
@@ -63,4 +66,9 @@ void parse_command(String str, int command[]){
     }
   }
 }
+
+void pass_highscore_to_web(uint8_t place, char initial_1, char initial_2, char initial_3, uint8_t score){
+  printf("2,%i,%c%c%c,%i\n",place,initial_1,initial_2,initial_3, score); //Send score to website through serial port 
+}
+
 

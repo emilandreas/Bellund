@@ -31,7 +31,7 @@ void setup() {
   camera_init();
 }
 
-int count = 0;
+int count = 1;
 void loop(){
   //camera_test();
   state_machine();

@@ -13,5 +13,6 @@ void init_serial();
 void serialEvent();
 void handel_command(String str);
 void parse_command(String str, int command[]);
+void pass_highscore_to_web(uint8_t place, char initial_1, char initial_2, char initial_3, uint8_t score);
 
 #endif /* SERIAL_HANDLER_H_ */

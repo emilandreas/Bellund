@@ -122,6 +122,12 @@
     <Compile Include="Driver_files\message_handler.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Driver_files\music_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Driver_files\music_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Driver_files\SPI_driver.c">
       <SubType>compile</SubType>
     </Compile>

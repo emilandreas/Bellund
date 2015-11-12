@@ -17,22 +17,23 @@
 volatile State current_state;
 volatile uint8_t current_score;
 
-void play_pingpong(){
-	state_set(PLAY_PINGPONG);
+//Send CAN message to node 2 to start ping pong game with one of two controller states
+void play_pingpong(uint8_t state){
+	state_set(state);
 	score_set(0);
 	
-	//Send message to node 2, and go into waiting mode
+	//Send message to node 2
 	Message m;
 	m.id = GAME_STATUS;
 	m.length = 1;
-	m.data[0] = PLAY_PINGPONG;
+	m.data[0] = state;
 	CAN_transmit(&m);
 	
-	//Print message on screen
+	//Print message on screen, and go into waiting mode
 	oled_sram_clear_screen(0);
 	oled_sram_write_string(0, "Playing pingpong", 2);
 	char score[16];
-	while(current_state == PLAY_PINGPONG){
+	while(current_state == PLAY_PINGPONG_WEB || current_state == PLAY_PINGPONG_JOY){
 		_delay_ms(100);
 		printf("State %i \n\r", current_state);
 		send_controlls();
@@ -44,6 +45,13 @@ void play_pingpong(){
 	highscore_prompt(PINGPONG, current_score);
 }
 
+void play_pingpong_web(){
+	play_pingpong(PLAY_PINGPONG_WEB);
+}
+
+void play_pingpong_joy(){
+	play_pingpong(PLAY_PINGPONG_JOY);
+}
 
 void state_set(State state){
 	

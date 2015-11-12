@@ -6,6 +6,7 @@
  */
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "message_handler.h"
 #include "CAN_driver.h"
 #include "joy_driver.h"
@@ -51,7 +52,7 @@ void handle_message(){
 			score_set(m.data[1]);
 			break;
 		case HIGHSCORE:
-			send_highscore();
+			send_highscore(m.data[0]);
 		default:
 			break;
 	}
@@ -82,21 +83,19 @@ void send_controlls(){
 	CAN_transmit(&m);
 }
 
-void send_highscore(){
-	highscore laederboard[16];
-	highscore_leaderboard(PINGPONG, laederboard, 16);
+//send ping-pong highscore to node 2 through CAN
+void send_highscore(uint8_t i){
+	highscore leaderboard[16];
+	highscore_leaderboard(PINGPONG, leaderboard, 16);
 	Message m;
 	m.id = HIGHSCORE;
 	m.length = 5;
-	for (int i = 0; i < 16; i++){
-		m.data[0] = laederboard[i].place;
-		m.data[1] = laederboard[i].name[0];
-		m.data[2] = laederboard[i].name[1];
-		m.data[3] = laederboard[i].name[2];
-		m.data[4] = laederboard[i].score;
-		CAN_transmit(&m);
-	}
-	
+	m.data[0] = leaderboard[i].place;
+	m.data[1] = leaderboard[i].name[0];
+	m.data[2] = leaderboard[i].name[1];
+	m.data[3] = leaderboard[i].name[2];
+	m.data[4] = leaderboard[i].score;
+	CAN_transmit(&m);
 }
 
 

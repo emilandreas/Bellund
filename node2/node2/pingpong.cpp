@@ -27,13 +27,9 @@ void pingpong_init(){
   motor_init();  
   init_solenoid();
   init_PID(2.25, 1, 0, 16); //Initiate PID(kp, ki, kd, ms);
-}
-
-void start_pingpong(){
-  pingpong_init();
-  int shot_count = 0;
-  unsigned long int start_time = millis();
-  int is_shooting = 0;
+  shot_count = 0;
+  start_time = millis();
+  is_shooting = 0;
 }
 
 void send_status(State S){
@@ -52,7 +48,7 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     is_shooting = 1;
     shoot(); 
     shot_count++;
-    send_status(PLAY_PINGPONG);
+    send_status(get_current_state());
   }
   else if(input_select(shoot_input)< 90){
     is_shooting = 0;
@@ -71,6 +67,7 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     delay(50);
     send_status(SLEEP);
     stop_pid();
+    shot_count = 0;
   }
 }
 

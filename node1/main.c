@@ -18,6 +18,7 @@
 #include "Game_files/draw.h"
 #include "Driver_files/CAN_driver.h"
 #include "Driver_files/message_handler.h"
+#include "Driver_files/music_driver.h"
 
 int main(void)
 {
@@ -31,6 +32,7 @@ int main(void)
 	printf("Reset?");
     while(1)
     {
+	
 		menuSystem();
 		//printf("adc output: x = %i\t\t y = %i\t\t Direction = %i\n\r", get_adc(1),get_adc(0),joy.D);
 		/*

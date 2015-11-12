@@ -79,7 +79,16 @@ void playSnake(){
 	while (!detectCollision(first->next, first->x, first->y)){
 		Joystick j = get_joystick_position();
 		direction D = j.D;
-		S = (D == NEUTRAL) ? S : D;
+		//S = (D == NEUTRAL) ? S : D;
+		if (D == NEUTRAL){ // New direction neutral
+			//Do nothing
+		}
+		else if((D == DOWN && S == UP) || (D == UP && S == DOWN) || (D == LEFT && S == RIGHT) || (D == RIGHT && S == LEFT)){ //New direction in opposite direction(NOT ALLOWED)
+			//Do nothing
+		}   
+		else{
+			S = D;
+		}
 		//Create and set up next snake segment
 		segment *temp = (segment*)malloc(sizeof(segment));
 		

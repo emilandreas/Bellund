@@ -9,5 +9,5 @@
 
 
 int get_diode(){
-  return analogRead(A0)> 50;
+  return analogRead(A0)> 15;
 }

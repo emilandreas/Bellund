@@ -28,15 +28,17 @@ void menuSystem(){
 	highscore.name_functions[1] = "Pong";
 	highscore.name_functions[2] = "Ping Pong";
 	
-	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 4};
+	menu playGame = {.name = "Play Game", .parent = &mainMenu, .num_functions = 5};
 	playGame.functions[0] = &play_draw;
 	playGame.functions[1] = &playSnake;
 	playGame.functions[2] = &playPong;
-	playGame.functions[3] = &play_pingpong;
+	playGame.functions[3] = &play_pingpong_web;
+	playGame.functions[4] = &play_pingpong_joy;
 	playGame.name_functions[0] = "Draw";
 	playGame.name_functions[1] = "Snake";
 	playGame.name_functions[2] = "Pong";
-	playGame.name_functions[3] = "Ping Pong";
+	playGame.name_functions[3] = "Ping Pong WEB";
+	playGame.name_functions[4] = "Ping Pong JOY";
 	mainMenu.submenues[0] = &playGame;
 		
 	menu settings = {.name = "Settings", .parent = &mainMenu, .num_functions = 2};

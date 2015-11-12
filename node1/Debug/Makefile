@@ -42,6 +42,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../Driver_files/EEPROM_driver.c \
 ../Driver_files/message_handler.c \
+../Driver_files/music_driver.c \
 ../Driver_files/SPI_driver.c \
 ../Game_files/highscore.c \
 ../Game_files/pingpong.c \
@@ -68,6 +69,7 @@ ASM_SRCS +=
 OBJS +=  \
 Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
+Driver_files/music_driver.o \
 Driver_files/SPI_driver.o \
 Game_files/highscore.o \
 Game_files/pingpong.o \
@@ -87,6 +89,7 @@ Interface_files/menu.o
 OBJS_AS_ARGS +=  \
 Driver_files/EEPROM_driver.o \
 Driver_files/message_handler.o \
+Driver_files/music_driver.o \
 Driver_files/SPI_driver.o \
 Game_files/highscore.o \
 Game_files/pingpong.o \
@@ -106,6 +109,7 @@ Interface_files/menu.o
 C_DEPS +=  \
 Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
+Driver_files/music_driver.d \
 Driver_files/SPI_driver.d \
 Game_files/highscore.d \
 Game_files/pingpong.d \
@@ -125,6 +129,7 @@ Interface_files/menu.d
 C_DEPS_AS_ARGS +=  \
 Driver_files/EEPROM_driver.d \
 Driver_files/message_handler.d \
+Driver_files/music_driver.d \
 Driver_files/SPI_driver.d \
 Game_files/highscore.d \
 Game_files/pingpong.d \
@@ -155,6 +160,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

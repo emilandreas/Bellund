@@ -9,9 +9,11 @@
 #ifndef PINGPONG_H_
 #define PINGPONG_H_
 
-typedef enum{SLEEP = 0, PLAY_PINGPONG = 1}State;
+typedef enum{SLEEP = 0, PLAY_PINGPONG_WEB = 1, PLAY_PINGPONG_JOY = 2}State;
 
-void play_pingpong();
+void play_pingpong(uint8_t controller_mode);
+void play_pingpong_web();
+void play_pingpong_joy();
 void state_set(State state);
 void score_set(uint8_t score);
 

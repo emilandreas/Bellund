@@ -6,6 +6,8 @@ Driver_files\EEPROM_driver.c
 
 Driver_files\message_handler.c
 
+Driver_files\music_driver.c
+
 Driver_files\SPI_driver.c
 
 Game_files\highscore.c
