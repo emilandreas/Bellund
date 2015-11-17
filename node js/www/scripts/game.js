@@ -34,7 +34,7 @@ var setIncrement = function(i){
 //increment key every 20 ms
 window.setInterval(function(){
   arrow(increment);
-}, 20);
+}, 10);
 
 
 //function to check when key is pressed: 
@@ -152,7 +152,7 @@ var sendControlls = function(){
       socket.emit('controll', [key, KeyShoot]);
       break;
     case 1:
-      socket.emit('controll', [tiltX, tiltY]);
+      socket.emit('controll', [tiltX, (tiltY == 0 && KeyShoot == 0)? 0 : 1]);
       break;
   }
 }

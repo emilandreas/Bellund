@@ -14,7 +14,7 @@ var io = require('socket.io')(http);
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
-var sp = new SerialPort("COM5", {
+var sp = new SerialPort("COM13", {
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
 }, false);
@@ -44,6 +44,9 @@ io.on('connection', function(socket){
   });
   socket.on('score', function(){
     console.log('Get highscore');
+    for (var i =  0; i < 16; i++) {
+      sp.write("2, " + i + "\n");
+    };
     socket.emit('score', leaderboard);
   });
 });
