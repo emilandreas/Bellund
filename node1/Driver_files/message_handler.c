@@ -16,7 +16,7 @@
 volatile int handelingMessage = 0;
 
 
-void init_handler(){
+void handler_init(){
 	// Set pin as input (PD3 = INT1)
 	DDRD &= ~(1 << PD3);
 	// Set internal pull-up
@@ -35,6 +35,21 @@ ISR(INT1_vect){
 	handle_message();
 }
 
+//send ping-pong highscore to node 2 through CAN
+void send_highscore(uint8_t i){
+	highscore leaderboard[16];
+	highscore_leaderboard(PINGPONG, leaderboard, 16);
+	Message m;
+	m.id = HIGHSCORE;
+	m.length = 5;
+	m.data[0] = leaderboard[i].place;
+	m.data[1] = leaderboard[i].name[0];
+	m.data[2] = leaderboard[i].name[1];
+	m.data[3] = leaderboard[i].name[2];
+	m.data[4] = leaderboard[i].score;
+	CAN_transmit(&m);
+}
+
 
 void handle_message(){
 	Message m;
@@ -49,7 +64,9 @@ void handle_message(){
 			break;
 		case GAME_STATUS:
 			state_set(m.data[0]);
-			score_set(m.data[1]);
+			if (m.data[0] != SLEEP){
+				score_set(m.data[1]);
+			}
 			break;
 		case HIGHSCORE:
 			send_highscore(m.data[0]);
@@ -83,19 +100,5 @@ void send_controlls(){
 	CAN_transmit(&m);
 }
 
-//send ping-pong highscore to node 2 through CAN
-void send_highscore(uint8_t i){
-	highscore leaderboard[16];
-	highscore_leaderboard(PINGPONG, leaderboard, 16);
-	Message m;
-	m.id = HIGHSCORE;
-	m.length = 5;
-	m.data[0] = leaderboard[i].place;
-	m.data[1] = leaderboard[i].name[0];
-	m.data[2] = leaderboard[i].name[1];
-	m.data[3] = leaderboard[i].name[2];
-	m.data[4] = leaderboard[i].score;
-	CAN_transmit(&m);
-}
 
 

@@ -45,7 +45,7 @@ void menuSystem(){
 	ping_pong.functions[2] = &play_pingpong_self;
 	ping_pong.name_functions[0] = "Normal Control";
 	ping_pong.name_functions[1] = "Web Control";
-	ping_pong.name_functions[2] = "Self Controlled";
+	ping_pong.name_functions[2] = "Self Control";
 	playGame.submenues[0] = &ping_pong;
 	
 		

@@ -10,7 +10,7 @@
 #define MESSAGE_HANDLER_H_
 
 
-void init_handler();
+void handler_init();
 
 void handle_message();
 void send_controlls();

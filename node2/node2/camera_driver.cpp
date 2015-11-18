@@ -23,15 +23,19 @@ void camera_init(){
 }
 
 void update_pos(){
-  uint16_t blocks = pixy.getBlocks();
+  uint16_t blocks;
+  blocks = pixy.getBlocks();
   if (blocks){
-    for(int i = 0; i < blocks; i++){
-      switch(pixy.blocks[0].signature){
+    for(int i = 0; i < 2; i++){
+      //printf("B: %i, S: %i, X:%i \n", blocks, pixy.blocks[i].signature, pixy.blocks[i].x);
+      switch(pixy.blocks[i].signature){
         case 1:
+          //printf("Ball: %i, %i \t \n", pixy.blocks[i].signature,pixy.blocks[i].x);
           ball_pos_x = pixy.blocks[i].x;
           ball_pos_y = pixy.blocks[i].y;
           break;
         case 2:
+          //printf("Shooter: %i, %i \n",  pixy.blocks[i].signature,pixy.blocks[i].x);
           shooter_pos_x = pixy.blocks[i].x;
           shooter_pos_y = pixy.blocks[i].y;
           break;
@@ -44,7 +48,7 @@ void update_pos(){
 
 uint16_t get_ball_pos_x(){
   update_pos();
-  int value = map(ball_pos_x,280,50, 0, 99); // 0, 319 is left, right limit of pixi
+  int value = map(ball_pos_x,320-60,60, 0, 99); // 0, 319 is left, right limit of pixi
   if (value > 100){
     value = 100;
   }
@@ -54,9 +58,22 @@ uint16_t get_ball_pos_x(){
   return value;
 }
 
-uint16_t get_camera_error(){
+uint16_t get_shooter_pos_x(){
   update_pos();
-  return (ball_pos_x - shooter_pos_x);
+  int value = map(shooter_pos_x,280,50, 0, 99); // 0, 319 is left, right limit of pixi
+  if (value > 100){
+    value = 100;
+  }
+  else if (value < 0){
+    value = 0;
+  }
+  return value;
+}
+
+int get_camera_error(){
+  update_pos();
+  //printf("Error: %i \n", ((int)shooter_pos_x - (int)ball_pos_x)/4);
+  return -((int)ball_pos_x - (int)shooter_pos_x)/4;
 }
 
 

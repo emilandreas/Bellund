@@ -34,15 +34,6 @@ void pingpong_init(){
   is_shooting = 0;
 }
 
-void send_status(State S){
-  Message m;
-  m.id = GAME_STATUS;
-  m.length = 2;
-  m.data[0] = S;
-  m.data[1] = shot_count;
-  CAN_transmit(&m);
-}
-
 
 void play_pingpong(int servo_input, int carrige_input, int shoot_input){
   //shoot
@@ -50,31 +41,33 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
     is_shooting = 1;
     shoot(); 
     shot_count++;
-    send_status(get_current_state());
+    send_status(get_current_state(), shot_count);
   }
   else if(input_select(shoot_input)< 90){
     is_shooting = 0;
   }
   //servo
   servo_set(input_select(servo_input));
-  camera_test();
-  //printf("BallX: %u\t\t ShooterX: %u\n", get_ball_pos_x());
-  //carrige
+  //Choose where to get pid error
   switch(get_current_state()){
     case PLAY_PINGPONG_WEB:
     case PLAY_PINGPONG_JOY:
       set_pid_error(input_select(carrige_input) - get_position());
       break;
     case PLAY_PINGPONG_SELF:
-      set_pid_error(get_camera_error()/2);
+      //set_pid_error(get_camera_error());
+      set_pid_error((get_ball_pos_x()-get_position()));
       break;
   }
+  //carrige
   controll_motor(controllSignal());
- //printf("Get_diode: %i\n",get_diode());
+  //printf("Get_diode: %i\n",get_diode());
   if(!get_diode()){
     state_set(SLEEP);
-    delay(50);
-    send_status(SLEEP);
+    delay(100);
+    send_status(SLEEP, shot_count);
+    delay(100);
+    send_status(SLEEP, shot_count);
     stop_pid();
     shot_count = 0;
   }

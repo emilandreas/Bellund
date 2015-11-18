@@ -8,11 +8,14 @@
 #include <arduino.h>
 #include "state_machine.h"
 #include "pingpong.h"
+#include "serial_handler.h"
+#include "message_handler.h"
 
 volatile State current_state = SLEEP;
 volatile State next_state = SLEEP;
 
 void state_machine(){
+    serialEvent(); //
     delay(20);
     switch(current_state){
       case SLEEP:
@@ -23,6 +26,7 @@ void state_machine(){
             pingpong_init();
             break;
           case SLEEP:
+            //send_status(current_state, 0);
             break;
         }
         break;
@@ -44,8 +48,17 @@ void state_machine(){
         }
         break;
     }
-    printf("state: %i\n", (int)current_state);
+    //printf("state: %i\n", (int)current_state);
     current_state = next_state;
+}
+
+void send_status(State S, int shot_count){
+  Message m;
+  m.id = GAME_STATUS;
+  m.length = 2;
+  m.data[0] = S;
+  m.data[1] = shot_count;
+  CAN_transmit(&m);
 }
 
 State get_current_state(){

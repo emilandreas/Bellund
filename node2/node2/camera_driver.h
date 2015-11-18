@@ -11,7 +11,7 @@
 
 uint16_t get_ball_pos_x();
 uint16_t get_ball_pos_y();
-uint16_t get_camera_error();
+int get_camera_error();
 
 void camera_init();
 void camera_test();
