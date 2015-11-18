@@ -46,6 +46,7 @@ io.on('connection', function(socket){
     console.log('Get highscore');
     for (var i =  0; i < 16; i++) {
       sp.write("2, " + i + "\n");
+      sleep(50);
     };
     socket.emit('score', leaderboard);
   });
@@ -75,3 +76,13 @@ sp.open(function (error) {
     });
   }
 });
+
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
