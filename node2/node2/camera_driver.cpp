@@ -27,11 +27,11 @@ void update_pos(){
   if (blocks){
     for(int i = 0; i < blocks; i++){
       switch(pixy.blocks[0].signature){
-        case 0:
+        case 1:
           ball_pos_x = pixy.blocks[i].x;
           ball_pos_y = pixy.blocks[i].y;
           break;
-        case 1:
+        case 2:
           shooter_pos_x = pixy.blocks[i].x;
           shooter_pos_y = pixy.blocks[i].y;
           break;

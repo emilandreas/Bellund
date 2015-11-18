@@ -38,6 +38,7 @@ void motor_init(){
   
   //Calibrate
   calibrate_encoder();
+  controll_motor(0);
 }
 
 int read_encoder(){
