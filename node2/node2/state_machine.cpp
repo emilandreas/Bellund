@@ -15,8 +15,7 @@ volatile State current_state = SLEEP;
 volatile State next_state = SLEEP;
 
 void state_machine(){
-    serialEvent(); //
-    delay(20);
+    serialEvent(); //check if message from server
     switch(current_state){
       case SLEEP:
         switch(next_state){
@@ -50,6 +49,7 @@ void state_machine(){
     }
     //printf("state: %i\n", (int)current_state);
     current_state = next_state;
+    delay(20);
 }
 
 void send_status(State S, int shot_count){
@@ -61,6 +61,9 @@ void send_status(State S, int shot_count){
   CAN_transmit(&m);
 }
 
+/////////////////////////////
+//External state manipulation
+/////////////////////////////
 State get_current_state(){
   return current_state;
 }

@@ -5,14 +5,8 @@
 
 extern "C" {
 #include "CAN_driver.h"
-//#include "spi_driver.h"
-//#include "MCP_driver.h"
 }
-
-//#include "motor_driver.h"
-//#include "servo.h"
 #include "print.h"
-//#include "controll_driver.h"
 #include "message_handler.h"
 #include "state_machine.h"
 #include "serial_handler.h"

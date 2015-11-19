@@ -61,12 +61,12 @@ void play_pingpong(int servo_input, int carrige_input, int shoot_input){
   }
   //carrige
   controll_motor(controllSignal());
-  //printf("Get_diode: %i\n",get_diode());
-  if(!get_diode()){
+  
+  if(analogRead(A0) < 100){ //ir value below 100
     state_set(SLEEP);
     delay(100);
     send_status(SLEEP, shot_count);
-    delay(100);
+    delay(50);
     send_status(SLEEP, shot_count);
     stop_pid();
     shot_count = 0;

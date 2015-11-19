@@ -44,8 +44,6 @@ void CAN_transmit(Message *m){
   
   //Send SPI RTS
   MCP_rts(0);
-  
-  //set !TXnRTS low of transmit register
 }
 
 int CAN_receive(Message *m){
